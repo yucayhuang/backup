@@ -1,0 +1,5 @@
+	[AddComponentMenu("Mesh/Dynamic Mesh")]
+	public class DynamicMesh : MonoBehaviour {
+
+
+将在editor的addComponent按钮加入菜单，具体目录是Mesh下叫Dynamic Mesh

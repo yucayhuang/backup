@@ -1,0 +1,25 @@
+1. 物体A  获取物体内自带组件（如Collision，Rigitbody）
+	gameObject.GetComponent<BoxCollider2D>();
+
+2. 物体A  获取物体内子物体a
+	transform.Find("a");
+
+3. 物体A  获取场景内的另一个物体B
+	GameObject.Find("B");
+	ps:GameObject.Find("B").SendMessage("reset");
+
+
+//test01和test02属于同一个GameObject：直接调用getcomponent获取脚本组件
+test01和test02不属于同一个GameObject：可以通过定义test02所属GameObject的tag，然后在test01中FindGameObjectWithTag或者直接在test01中Find而不定义tag
+
+
+GameObject可以根据游戏物体的名称查找所有层级的游戏物体，不支持查找被禁用（未激活）物体
+
+Transform只能查找脚本所依附的游戏对象的子物体中，并且只能查一级子物体，如查找多层需要完整路径，支持查找被禁用物体
+
+
+
+
+
+
+gameObject.transform, transform.gameObject

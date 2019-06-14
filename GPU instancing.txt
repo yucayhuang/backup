@@ -1,0 +1,23 @@
+在5.6的版本里,Instancing不再是一个单独的shader，而是一个开关。
+
+勾选一个material的instancing
+
+void Update()
+{
+    var meshRenderer = template.GetComponent<MeshRenderer>();
+    var meshFilter = template.GetComponent<MeshFilter>();
+    var mesh = meshFilter.sharedMesh;
+    var matrices = new Matrix4x4[instanceCount];
+
+    for (int i = 0; i < matrices.Length; i++)
+    {
+        var position = Random.insideUnitSphere * range;
+        var rotation = Quaternion.LookRotation(Random.insideUnitSphere);
+        var scale = Vector3.one * Random.Range(-2f, 2f);
+        var matrix = Matrix4x4.TRS(position, rotation, scale);
+
+        matrices[i] = matrix;
+    }
+
+    Graphics.DrawMeshInstanced(mesh, 0, meshRenderer.sharedMaterial, matrices);
+}

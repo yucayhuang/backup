@@ -1,0 +1,44 @@
+public class FollowTarget:MonoBehaviour{
+
+	private Transform player;
+
+	void Star(){
+		player = GameObject.FindGameObjectWithTag("player").transform;
+
+
+ps:
+场景中的玩家设置tag为"player"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.GameObject.Find()：寻找Hierarchy面板中的activie 不为false的游戏对象；
+路径如官方事例写法：
+public class ExampleClass : MonoBehaviour {
+    public GameObject hand;
+    void Example() {
+        hand = GameObject.Find("Hand");
+        hand = GameObject.Find("/Hand");
+        hand = GameObject.Find("/Monster/Arm/Hand");
+        hand = GameObject.Find("Monster/Arm/Hand");
+    }
+}
+2.Transform.Find（）
+官方解释是通过名字获取到一个子物体（Finds a child by name and returns it），该方法可以获取到隐藏（inactive）的GameObject,
+可以通过先获得父对象（active必须为true），再通过寻找孩子Transform.Find（）
+       GameObject rootObj = GameObject.Find("GameObject");       
+         GameObject transformObj=  rootObj.transform.Find("xxxx").gameObject;
+          transformObj.SetActive(true)
+3.transform.GetChild(index)；index为索引，0,1,2,3,4代表第几个child.

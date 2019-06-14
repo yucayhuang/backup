@@ -1,0 +1,13 @@
+	void ReadSimpleObjects(){
+		if(File.Exists(filePath)){
+			using(FileStream fs = File.OpenRead(filePath)){
+				BinaryReader fileReader = new BinaryReader(fs);
+				int count = fileReader.ReadInt32();
+				for(int i=0; i<count; i++){
+					GameObject simpleObj = new GameObject();
+					simpleObj.transform.parent = this.transform;
+					simpleObj.name = fileReader.ReadString();
+				}
+			}
+		}
+	}

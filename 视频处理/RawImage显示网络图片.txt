@@ -1,0 +1,62 @@
+RawImage控件：用于显示Texture（纹理）类型的图片，常用于（不仅限于）显示网络图片
+
+示例：
+
+
+
+在Canvas下新建一个RawImage控件，为RawImage控件添加一个脚本LoadImageFromNetwork，实现从网络加载图片
+
+ 
+
+public class LoadImageFromNetwork : MonoBehaviour {
+
+
+	public string url;
+
+ 
+	private RawImage rawImage;
+
+ 
+	void Start () {
+				rawImage = this.GetComponent<RawImage> ();
+
+		StartCoroutine (LoadImage());
+
+	}
+
+	IEnumerator LoadImage()
+ 
+	{
+
+		WWW www = new WWW (url);
+
+		yield return www;
+		rawImage.texture = www.texture;
+		
+		Debug.Log ("加载完成！");
+
+	}
+
+}
+
+
+
+还有一种用法是，映射一个摄像机的画面：
+
+
+在Unity中新建一个额外的摄像机NewCamera，在Project中新建一个RenderTexture，名字自己起，将它赋值给NewCamera的TargetTexture属性和RawImage的Texture属性
+
+
+
+
+
+
+--------------------- 学习帮助 ------------------------------
+
+
+RawImage和Image的区别：
+
+Image控件用于显示Sprite类型的图片
+
+
+RawImage控件用于显示Texture类型图片

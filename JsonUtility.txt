@@ -1,0 +1,31 @@
+[Serializable]  
+    public class MyJsonClass  
+    {  
+        public int level;  
+        public float timeElapsed;  
+        public string playerName;  
+    }  
+  
+  
+    class MyClass : MonoBehaviour  
+    {  
+        int[] myarray;  
+  
+        int a = 1;  
+  
+        void Start()  
+        {  
+            MyJsonClass myObject = new MyJsonClass();  
+            myObject.level = 1;  
+            myObject.timeElapsed = 47.5f;  
+            myObject.playerName = "Dr Charles Francis";  
+            //得到json 最小size字符串   
+            string json = JsonUtility.ToJson(myObject);  
+            //得到json 可读性字符串  
+            string json2 = JsonUtility.ToJson(myObject);  
+            Debug.Log("json =- > " + json);  
+  
+  
+  
+            //FromJson  根据json字符串来生成一个object  
+            MyJsonClass myObject2 = JsonUtility.FromJson<MyJsonClass>(json) as MyJsonClass;  

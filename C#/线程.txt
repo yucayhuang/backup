@@ -1,0 +1,33 @@
+
+		Debug.Log ("------------------- thread -------------------");
+		Thread mt = Thread.CurrentThread;
+		//mt.Name = "mainThread";
+		ThreadStart ts = new ThreadStart (doThread);
+		Thread childThread = new Thread (ts);
+		childThread.Name = "childThread";
+		childThread.Start ();
+		Debug.Log ("------------------- main thread end -------------------");
+		_fistCreate = false;
+	}
+	
+
+	void doThread(){
+		Debug.Log ("doing "+Thread.CurrentThread.Name+" stuff ");
+		Thread.Sleep (10000);
+		Debug.Log ("current "+Thread.CurrentThread.Name+" finish ");
+	}
+
+
+结果
+"------------------- thread -------------------"
+"doing childThread stuff"
+"------------------- main thread end -------------------"
+(等待了10s)
+"current childThread finish"
+
+
+
+注意，主线程，即UI线程，才可访问组件UI，子线程，即work线程，不能
+带参数thread委托：ParameterizedThreadStart 或
+  Thread t = new Thread (Print);
+  t.Start ("Hello from t!");

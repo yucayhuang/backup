@@ -1,0 +1,95 @@
+	void Start () {
+		//纵向 上下 两个方向
+		iPhoneKeyboard.autorotateToPortrait = false;
+		iPhoneKeyboard.autorotateToPortraitUpsideDown = false;
+ 
+		//横向 上下两个方向
+		iPhoneKeyboard.autorotateToLandscapeLeft = false;
+		iPhoneKeyboard.autorotateToLandscapeRight = false;
+	}
+
+
+
+
+ 		if (GUI.Button(new Rect(320, 10, 300, 100), "open Keyboard"))  { 
+        	 	//打开iphone输入框
+        		//第一个参数 默认显示 test
+        	  	//第二个参数 设置输入框类型，这里为默认，什么都可以输入
+			keyboard = iPhoneKeyboard.Open("test",iPhoneKeyboardType.Default);
+ 		}
+ 
+		if(keyboard != null){
+ 
+			if (keyboard.done){
+				//输入完毕后 点击done 输入输入内容
+				Debug.Log( keyboard.text)	;
+			}	
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Input.deviceOrientation 可以得到当前IOS 设备屏幕的方向状态。
+
+Screen.orientation 设置屏幕的反转情况
+
+	void Update () {
+
+		//处理横向两个方向旋转
+		if(Input.deviceOrientation == DeviceOrientation.LandscapeLeft)
+		{
+			if (Screen.orientation != ScreenOrientation.LandscapeLeft) {
+				Screen.orientation = ScreenOrientation.LandscapeLeft;
+			}
+		}else if(Input.deviceOrientation == DeviceOrientation.LandscapeRight)
+		{
+			if (Screen.orientation != ScreenOrientation.LandscapeRight) {
+				Screen.orientation = ScreenOrientation.LandscapeRight;
+			}
+ 
+		}else 
+		//处理纵向两个方向的旋转
+		if(Input.deviceOrientation == DeviceOrientation.Portrait)
+		{
+			if (Screen.orientation != ScreenOrientation.Portrait) {
+				Screen.orientation = ScreenOrientation.Portrait;
+			}
+		}else if(Input.deviceOrientation == DeviceOrientation.PortraitUpsideDown)
+		{
+			if (Screen.orientation != ScreenOrientation.PortraitUpsideDown) {
+				Screen.orientation = ScreenOrientation.PortraitUpsideDown;
+			}
+		}
+	}
+
+
+
+
+
+
+屏幕面朝上：LandscapeLeft.FaceUp
+屏幕面朝下：LandscapeLeft.FaceDown
+
+
+
+
+
+
+
+
+
+
+
+
+

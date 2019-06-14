@@ -1,0 +1,4 @@
+脚本物体间通信方式：
+GameObject.SendMessage：向自身的脚本中发送消息。参数为函数名和函数的参数
+GameObject.BroadcastMessage：向自身及子物体的脚本中发送消息
+GameObject.SendMessageUpwards：向自身及父物体的脚本中发送消息

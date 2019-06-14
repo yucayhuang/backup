@@ -1,0 +1,101 @@
+	if (!Physics.Linecast(transform.position, target.position))
+		ProcessData.AndDoSomeCalculations();
+		
+		
+	RaycastHit hit;
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit, 100.0F))
+            float distanceToGround = hit.distance;
+
+			
+	Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, 100))
+            print("Hit something");
+
+
+	RaycastHit[] hits;
+        hits = Physics.RaycastAll(transform.position, transform.forward, 100.0F);
+        int i = 0;
+        while (i < hits.Length) {
+            RaycastHit hit = hits[i];
+            Renderer renderer = hit.collider.renderer;
+            if (renderer) {
+                renderer.material.shader = Shader.Find("Transparent/Diffuse");
+                renderer.material.color.a = 0.3F;
+            }
+            i++;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Physics
+RaycastHit 光线投射碰撞
+Ray 射线
+第一种是：
+
+Physics.Linecast 线性投射
+从开始位置到结束位置做一个光线投射，如果与碰撞体交互，返回真。
+
+        Debug.DrawLine(transform.position, Line_floor.position, Color.red, 1f);
+        bool grounded  = Physics.Linecast(transform.position, Line_floor.position, 1 << LayerMask.NameToLayer("Ground"));
+
+        if (grounded)
+            Debug.LogError("发生了碰撞");   
+        else 
+            Debug.LogError("碰撞结束");
+
+第二种：
+
+在场景中投下可与所有碰撞器碰撞的一条光线。可控制投射方向和投射长度
+
+ Vector3 fwd = transform.TransformDirection(-Vector3.up);
+  bool grounded =  Physics.Raycast(transform.position,fwd, 10 );
+
+        if (grounded)
+            Debug.LogError("发生了碰撞"); 
+        else 
+            Debug.LogError("碰撞结束");
+        
+第三种：
+
+在场景中投下可与所有碰撞器碰撞的一条光线，并返回碰撞的细节信息。
+
+
+    RaycastHit hit;
+         bool grounded = Physics.Raycast(transform.position, -Vector3.up, out hit);
+         // 可控制投射距离bool grounded = Physics.Raycast(transform.position, -Vector3.up, out hit,100.0);
+        if (grounded)
+        {
+            Debug.LogError("发生了碰撞");
+            Debug.LogError("距离是：" + hit.distance);
+            Debug.LogError("被碰撞的物体是：" + hit.collider.gameObject.name);
+  
+        }
+        else {
+            Debug.LogError("碰撞结束");
+        }
+
+注意，这里返回的碰撞器的信息是依次的，先返回第一个碰撞的，第一个碰撞结束后才返回第二个。

@@ -1,0 +1,4 @@
+MovieTxture是一个texture ，可以赋值给RawImage的texture ,或者renderer.material.mainTexture
+
+Video Player是Unity5.6之后新增加的，丰富了Unity播放频的功能，可轻松实现视频播放速度的控制，快进快退，视频透明度控制等。
+在使用时，将文件导入到工程中后，将其导入格式设置成Video Clip，就可以将其直接设置给Video Player组件的Video Clip属性（前提是Source属性选择为Video Clip方式）。当然，也可以设置Source为URL模式，通过给定具体的视频地址实现视频的播放。

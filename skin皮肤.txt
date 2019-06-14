@@ -1,0 +1,67 @@
+
+　　function OnGUI () {
+
+　　// 使用“box”样式创建一个标签控件
+
+　　GUI.Label (Rect (0,0,200,100), “Hi - I'm a label looking like a box”, “box”);
+
+　　// 使用“toggle”样式创建一个按钮控件
+
+　　GUI.Button (Rect (10,140,180,20), “This is a button”, “toggle”);
+
+　　}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+　　var customButton : GUIStyle;
+
+　　function OnGUI () {
+
+　　// 使用通过GUIStyle变量设定的样式创建按钮
+	
+　　GUI.Button (Rect (10,10,150,20), “I am a Custom Button”, customButton);
+	
+　　}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+　　// 将Skin赋值
+
+　　GUI.skin = mySkin;
+
+　　之后可以在同一个OnGUI()函数调用中简单的切换Skin
+
+　　// 恢复Skin为缺省
+	
+　　GUI.skin = null;

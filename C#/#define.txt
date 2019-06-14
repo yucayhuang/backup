@@ -1,0 +1,24 @@
+#define DEBUG
+#define VC_V10
+using System;
+public class TestClass
+{
+   public static void Main()
+   {
+
+      #if (DEBUG && !VC_V10)
+         Console.WriteLine("DEBUG is defined");
+      #elif (!DEBUG && VC_V10)
+         Console.WriteLine("VC_V10 is defined");
+      #elif (DEBUG && VC_V10)
+         Console.WriteLine("DEBUG and VC_V10 are defined");
+      #else
+         Console.WriteLine("DEBUG and VC_V10 are not defined");
+      #endif
+      Console.ReadKey();
+   }
+}
+
+
+总的来说和普通的控制语句（if等）功能类似，方便在于预处理器指令包含的未执行部分是不需要编译的。
+#warning 和 #error：

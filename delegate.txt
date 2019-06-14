@@ -1,0 +1,19 @@
+
+
+
+
+	public delegate void PickWeaponAction ( GameObject weapon );
+	public PickWeaponAction onPickWeapon;
+
+
+
+
+	public delegate void PickWeaponAction ( GameObject weapon );
+	public event PickWeaponAction OnPickWeapon;
+
+
+
+
+	public event EventHandler<ShapeEventArgs> ShapeChanged;
+	
+	

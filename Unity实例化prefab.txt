@@ -1,0 +1,7 @@
+在代码里面动态地实例化一个Prefab对象
+
+public GameObject PrefabObj;
+myPrefabObj = Instantiate( PrefabObj );
+
+
+然后将js拖到一个GameObject，并将创建好的prefab拖到这个GameObject的PrefabObj进行绑定

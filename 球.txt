@@ -1,0 +1,35 @@
+Circle Collider 2D --> Material (Physics2D Material, 摩擦力0，弹力1)
+
+Rigidbody 2D (重力0)
+
+
+
+Script
+public class Ball : MonoBehaviour {
+	
+	private Rigidbody2D rigitbody2D;
+	
+	void Start () 
+	{
+		rigitbody2D = GetComponent<Rigidbody2D>();
+		//给个初始力
+		int num = Random.Range(0, 2);
+		if(num == 1)
+			rigitbody2D.AddForce(new Vector2(100, 0));
+		else
+			rigitbody2D.AddForce(new Vector2(-100, 0));
+	}
+	
+	void update(){}
+	
+	void OnCollisionEnter2D( Collision2D col)
+	{
+		if(col.collider.tag == "Player"){
+			Vector2 velocity = rigitbody2D.velocity;
+			velocity.y += col.rigitbody.velocity.y;
+			rigitbody2D.velocity = velocity;
+		}
+		if(col.gameObject.name == "wall"){}
+	}
+}
+		

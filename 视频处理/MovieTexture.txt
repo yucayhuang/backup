@@ -1,0 +1,119 @@
+方法一：
+
+
+01	using UnityEngine;
+02	using System.Collections;
+03	 
+04	public class Test: MonoBehaviour
+05	{
+06	 
+07	    //电影纹理
+08	    public MovieTexture movTexture;
+09	 
+10	    void Start()
+11	    {
+12	        //设置当前对象的主纹理为电影纹理
+13	        renderer.material.mainTexture = movTexture;
+14	        //设置电影纹理播放模式为循环
+15	        movTexture.loop = true;
+16	    }
+17	 
+18	    void OnGUI()
+19	    {
+20	        if(GUILayout.Button("播放/继续"))
+21	        {
+22	            //播放/继续播放视频
+23	            if(!movTexture.isPlaying)
+24	            {
+25	                movTexture.Play();
+26	            }
+27	 
+28	        }
+29	 
+30	        if(GUILayout.Button("暂停播放"))
+31	        {
+32	            //暂停播放
+33	            movTexture.Pause();
+34	        }
+35	 
+36	        if(GUILayout.Button("停止播放"))
+37	        {
+38	            //停止播放
+39	            movTexture.Stop();
+40	        }
+41	    }
+42	}
+
+
+
+
+
+
+方法二：
+
+
+01	using UnityEngine;
+02	using System.Collections;
+03	 
+04	public class Test: MonoBehaviour
+05	{
+06	 
+07	    //电影纹理
+08	    public MovieTexture movTexture;
+09	 
+10	    void Start()
+11	    {
+12	        //设置电影纹理播放模式为循环
+13	        movTexture.loop = true;
+14	    }
+15	 
+16	    void OnGUI()
+17	    {
+18	        //绘制电影纹理
+19	        GUI.DrawTexture (new Rect (0,0, Screen.width, Screen.height),movTexture,ScaleMode.StretchToFill); 
+20	 
+21	        if(GUILayout.Button("播放/继续"))
+22	        {
+23	            //播放/继续播放视频
+24	            if(!movTexture.isPlaying)
+25	            {
+26	                movTexture.Play();
+27	            }
+28	 
+29	        }
+30	 
+31	        if(GUILayout.Button("暂停播放"))
+32	        {
+33	            //暂停播放
+34	            movTexture.Pause();
+35	        }
+36	 
+37	        if(GUILayout.Button("停止播放"))
+38	        {
+39	            //停止播放
+40	            movTexture.Stop();
+41	        }
+42	    }
+43	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+这种方法可以在windows机器和Mac电脑播放，但是在移动设备（android,ios等）中就不管用了，那就可以用另一种方法代替了：
+
+　　function Start () {
+　　	Handheld.PlayFullScreenMovie (“StarWars.mp4”, Color.black, FullScreenMovieControlMode.CancelOnInput);
+　　}

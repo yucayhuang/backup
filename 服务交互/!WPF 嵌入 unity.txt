@@ -1,0 +1,506 @@
+把Unity3D嵌入winform或者wpf程序，过去大部分使用UnityWebPlayer插件来实现，这个插件其实就是网页上播放unity页游的插件。
+
+但是使用UnityWebPlayer嵌入桌面开发有各种问题，我认为最大的问题是效率问题（加载缓慢），毕竟是网页的加载方式，而且可以确认未来也不会得到任何优化。
+
+由于WebGL的高速发展，unity公司认识到了webplayer十分鸡肋，毕竟WebGL不需要任何插件可以直接显示3d内容了，所以Unity3D在5.4.x版本以后明确表示
+
+不再支持webplayer了，所以桌面上UnityWebPlayer插件能不用也就别用了吧。所以大家不要走弯路！！
+
+ 
+
+主要内容：
+
+ 
+
+将Unity嵌入桌面程序最好的方式是嵌入unity生成的exe程序，winform程序和unity之间通过socket进行通讯，我认为
+
+这也是效率最高，效果最好和最好实现的方式。在Unity程序脚本中，嵌入socket内容，我推荐做成客户端（client），使用wpf程序做服务器端,这是一个谁是主体的问题。
+
+这样wpf可以加载多个unity程序。
+
+ 
+
+嵌入后的结果如下图所示（请无视具体内容）：
+
+
+
+下面简单写了一个脚本，其中man是游戏中的一个gameobject对象。就是上图中穿蓝衣服的男人。在他身上挂着socket脚本如下：
+
+复制代码
+using UnityEngine;
+using System.Collections;
+using System.Net.Sockets;
+using System;
+
+public class demoshows : MonoBehaviour {
+    public GameObject man;
+
+
+
+    const int portNo = 500;
+    private TcpClient _client;
+    byte[] data;
+
+    string Error_Message;
+
+    void Start () {
+        try
+        {
+            this._client = new TcpClient();
+            this._client.Connect("127.0.0.1", portNo);
+            data = new byte[this._client.ReceiveBufferSize];
+            //SendMessage(txtNick.Text);
+            SendMessage("Unity Demo Client is Ready!");
+            this._client.GetStream().BeginRead(data, 0,System.Convert.ToInt32(this._client.ReceiveBufferSize), ReceiveMessage, null);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+    
+
+    void Update () {        
+        transform.Rotate(new Vector3(0, 1, 0),0.1f);
+    }
+
+
+    public void rotation()
+
+    {
+        transform.Rotate(new Vector3(0, 10, 0));
+        //targetRotation = Quaternion.Euler(45.0f, 45.0f, 45.0f);
+        //// 直接设置旋转角度 
+        //transform.rotation = targetRotation;
+        ////man.transform.rotation.SetAxisAngle(new Vector3(0, 1, 0), 30);;                                                                                                                      
+    }
+
+    public void translateX(float x)
+    {
+        transform.Translate(new Vector3(x,0,0));                                      
+    }
+
+    public void translateY(float y)
+    {
+        transform.Translate(new Vector3(0, y, 0));
+    }
+
+    public void translateZ(float z)
+    {
+        transform.Translate(new Vector3(0, 0, z));                 
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(50, 50, 150,50 ), Error_Message);
+    }
+
+
+    public new void SendMessage(string message)
+    {
+        try
+        {
+            NetworkStream ns = this._client.GetStream();
+            byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+            ns.Write(data, 0, data.Length);
+            ns.Flush();
+        }
+        catch (Exception ex)
+        {
+            Error_Message = ex.Message;
+            //MessageBox.Show(ex.ToString());
+        }
+    }
+    public void ReceiveMessage(IAsyncResult ar)
+    {
+        try
+        {
+            //清空errormessage
+            Error_Message = "";
+            int bytesRead;
+            bytesRead = this._client.GetStream().EndRead(ar);
+            if (bytesRead < 1)
+            {
+                return;
+            }
+            else
+            {
+                Debug.Log(System.Text.Encoding.ASCII.GetString(data, 0, bytesRead));
+                string message = System.Text.Encoding.ASCII.GetString(data, 0, bytesRead);
+                switch (message)
+                {
+                    case "1":
+                        translateX(1);
+                    break;
+
+                    case "2":
+                        translateX(-1);
+                        break;
+                    case "3":
+                        translateY(1);
+                        break;
+                    case "4":
+                        translateY(-1);
+                        break;
+                    case "5":
+                        translateZ(1);
+                        break;
+                    case "6":
+                        translateZ(-1);
+                        break;
+                    default:
+                        Error_Message = "unknown command";
+                        break;
+                }
+            }
+            this._client.GetStream().BeginRead(data, 0, System.Convert.ToInt32(this._client.ReceiveBufferSize), ReceiveMessage, null);
+        }
+        catch (Exception ex)
+        {
+            Error_Message = ex.Message;
+        }
+    }
+
+    void OnDestroy()
+    {
+        this._client.Close();
+    }
+}
+ 
+
+脚本很简单，就是通过向unity程序发送消息（1~6）实现模型的平移。
+
+
+服务器端，在wpf程序中简单建立一个socket类，ip和端口要和unity对应，在程序启动时先建立服务器端。
+
+ 
+
+复制代码
+using System.Net.Sockets;
+using System.Net;
+using System.Threading;
+using System.Diagnostics;
+using System.Text;
+using System;
+
+
+namespace Demo_Song
+{
+    class TcpServer
+    {
+        //私有成员
+        private static byte[] result = new byte[1024];
+        private int myProt = 500;   //端口  
+        static Socket serverSocket;
+        static Socket clientSocket;
+
+        Thread myThread;
+        static Thread receiveThread;
+
+        //属性
+
+        public int port { get; set; }
+        //方法
+
+
+        
+        internal void StartServer()
+        {
+            //服务器IP地址  
+            IPAddress ip = IPAddress.Parse("127.0.0.1");
+            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverSocket.Bind(new IPEndPoint(ip, myProt));  //绑定IP地址：端口  
+            serverSocket.Listen(10);    //设定最多10个排队连接请求  
+
+            Debug.WriteLine("启动监听{0}成功", serverSocket.LocalEndPoint.ToString());
+       
+            //通过Clientsoket发送数据  
+            myThread = new Thread(ListenClientConnect);
+            myThread.Start();
+            
+        }
+
+
+        internal void QuitServer()
+        {
+
+            serverSocket.Close();
+            clientSocket.Close();
+            myThread.Abort();
+            receiveThread.Abort();
+
+
+        }
+
+
+        internal void SendMessage(string msg)
+        {
+                clientSocket.Send(Encoding.ASCII.GetBytes(msg));
+        }
+
+
+
+        /// <summary>  
+        /// 监听客户端连接  
+        /// </summary>  
+        private static void ListenClientConnect()
+        {
+            while (true)
+            {
+                try
+                {
+                    clientSocket = serverSocket.Accept();
+                    clientSocket.Send(Encoding.ASCII.GetBytes("Server Say Hello"));
+                    receiveThread = new Thread(ReceiveMessage);
+                    receiveThread.Start(clientSocket);
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+        }
+
+        /// <summary>  
+        /// 接收消息  
+        /// </summary>  
+        /// <param name="clientSocket"></param>  
+        private static void ReceiveMessage(object clientSocket)
+        {
+            Socket myClientSocket = (Socket)clientSocket;
+            while (true)
+            {
+                try
+                {
+                    //通过clientSocket接收数据  
+                    int receiveNumber = myClientSocket.Receive(result);
+                    Debug.WriteLine("接收客户端{0}消息{1}", myClientSocket.RemoteEndPoint.ToString(), Encoding.ASCII.GetString(result, 0, receiveNumber));
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        Debug.WriteLine(ex.Message);
+                        myClientSocket.Shutdown(SocketShutdown.Both);
+                        myClientSocket.Close();
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                }
+            }
+        }
+    }
+}  
+
+复制代码
+ 
+
+使用socket一定要注意使用线程，并且退出时及时结束，我这里实现的也不是很好，谁有更好的方法可以告诉我。
+
+下面大概就是server的启动和释放，效果还好，至少不卡死....
+
+ 
+
+ 
+
+复制代码
+        TcpServer WpfServer;
+        int size_state = 0;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+
+            this.Closed += MainWindow_Closed;
+            this.Activated += MainWindow_Activated;
+            this.Deactivated += MainWindow_Deactivated;
+
+
+
+            WpfServer = new TcpServer();
+            WpfServer.StartServer();
+
+
+        }
+
+
+        void MainWindow_Closed(object sender, EventArgs e)
+        {
+            unityhost.Form1_FormClosed();
+
+
+            WpfServer.QuitServer();
+
+        }
+复制代码
+ 
+
+ 
+
+ 
+
+ 
+
+关于socket通讯的问题大概就这样，大家估计更关系如何嵌入的问题
+
+ 
+
+如何嵌入？
+
+ 
+
+首先在wpf程序中建立一个winform的自定义控件（不是wpf控件）usercontrol
+
+在usercontrol内新建一个panel（或者其他带有句柄的控件），并设置dock属性为fill。
+
+启动unity.exe，通过几个api将unity窗口附加在panel句柄上。
+
+（说明：借鉴别人的程序）
+
+需要把unity程序命名为child.exe，放在下面指定位置（Debug\UnityApp\Child.exe,或者release）
+
+process.StartInfo.FileName =Application.StartupPath +@"\UnityApp\Child.exe";
+
+
+详细代码如下：
+
+复制代码
+using System;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Threading;
+
+namespace Demo_Song
+{
+    public partial class UnityControl : UserControl
+    {
+        [DllImport("User32.dll")]
+        static extern bool MoveWindow(IntPtr handle, int x, int y, int width, int height, bool redraw);
+
+        internal delegate int WindowEnumProc(IntPtr hwnd, IntPtr lparam);
+        [DllImport("user32.dll")]
+        internal static extern bool EnumChildWindows(IntPtr hwnd, WindowEnumProc func, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        private Process process;
+        private IntPtr unityHWND = IntPtr.Zero;
+
+        private const int WM_ACTIVATE = 0x0006;
+        private readonly IntPtr WA_ACTIVE = new IntPtr(1);
+        private readonly IntPtr WA_INACTIVE = new IntPtr(0);
+
+
+
+
+
+        public UnityControl()
+        {
+            InitializeComponent();
+            this.Load += UnityControl_Load;
+            panel1.Resize+=panel1_Resize;
+        }
+
+        private void UnityControl_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                process = new Process();
+                process.StartInfo.FileName =Application.StartupPath +@"\UnityApp\Child.exe";
+                process.StartInfo.Arguments = "-parentHWND " + panel1.Handle.ToInt32() + " " + Environment.CommandLine;
+                process.StartInfo.UseShellExecute = true;
+                process.StartInfo.CreateNoWindow = true;
+
+                process.Start();
+
+                process.WaitForInputIdle();
+                // Doesn't work for some reason ?!
+                //unityHWND = process.MainWindowHandle;
+                EnumChildWindows(panel1.Handle, WindowEnum, IntPtr.Zero);
+
+                unityHWNDLabel.Text = "Unity HWND: 0x" + unityHWND.ToString("X8");
+            }
+            catch (Exception ex)
+            {
+                unityHWNDLabel.Text = ex.Message;
+                //MessageBox.Show(ex.Message);
+            }
+        }
+
+        internal void ActivateUnityWindow()
+        {
+            SendMessage(unityHWND, WM_ACTIVATE, WA_ACTIVE, IntPtr.Zero);
+        }
+
+        internal void DeactivateUnityWindow()
+        {
+            SendMessage(unityHWND, WM_ACTIVATE, WA_INACTIVE, IntPtr.Zero);
+        }
+
+        private int WindowEnum(IntPtr hwnd, IntPtr lparam)
+        {
+            unityHWND = hwnd;
+            ActivateUnityWindow();
+            return 0;
+        }
+
+        private void panel1_Resize(object sender, EventArgs e)
+        {
+            MoveWindow(unityHWND, 0, 0, panel1.Width, panel1.Height, true);
+            ActivateUnityWindow();
+        }
+
+        // Close Unity application
+        internal void Form1_FormClosed()
+        {
+            try
+            {
+                process.CloseMainWindow();
+
+                Thread.Sleep(1000);
+                while (process.HasExited == false)
+                    process.Kill();
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        internal void Form1_Activated()
+        {
+            ActivateUnityWindow();
+        }
+
+        internal void Form1_Deactivate()
+        {
+            DeactivateUnityWindow();
+        }
+    }
+
+}
+复制代码
+ 
+
+ 
+
+最后附上源码，github重置密码死活连不上，现在就传压缩包到百度云把，vs版本较高（2012）以上可以打开，注意，低版本打不开工程。
+
+ 
+
+博客地址迁移了，请到 这里
+
+http://www.songshizhao.com/blog/blogPage/78.html
+
+下载。
+
+ 
+
+貌似写得有点长了，能看到这里的人不多吧哈哈，希望有做类似需求的人少走弯路吧，碎觉去，over~。
+
+ 

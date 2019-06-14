@@ -1,0 +1,30 @@
+Unity 2D两种常用判断点击的方法
+1.Raycast法
+
+原理相同于3D中得Raycast法，具体使用略有区别。
+
+
+1 RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero); 
+2 
+3 if(hit.collider != null)
+5 { 
+7 　　Debug.Log ("Target Position: " + hit.collider.gameObject.transform.position);
+8 　　//and do what you want
+9 }
+
+2.Overlap法
+
+个人觉得这个方法对于2D更合适一些，判断点击的点落在了哪些collider中。
+
+
+1 Collider2D[] col = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+2  
+3 if(col.Length > 0)
+4 {
+5     foreach(Collider2D c in col)
+6     {
+7          //do what you want
+8     }
+9 }
+
+以上代码中用到的是mousePosition，对于触摸的Touch原理完全相同。

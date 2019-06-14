@@ -1,0 +1,12 @@
+ Lambda 运算符 =>
+
+形参列表=>函数体
+
+可以将此表达式分配给委托类型，如下所示：
+delegate int del(int i);
+    del myDelegate = x=>{return x*x;};
+   int j = myDelegate(5);//j=25
+创建表达式目录树类型：
+using System.Linq.Expressions;
+//...
+Expression <del>=x=>x*x;

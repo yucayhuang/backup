@@ -1,0 +1,31 @@
+C#中事件产生和实现的流程：
+1.定义A为产生事件的实例，a为A产生的一个事件
+2.定义B为接收事件的实例，b为处理事件的方法
+3.A由于用户(程序编写者或程序使用者)或者系统产生一个a事件(例如点击一个Button，产生一个Click事件)
+4.A通过事件列表中的委托对象将这个事件通知给B
+5.B接到一个事件通知(实际是B.b利用委托来实现事件的接收)
+6.调用B.b方法完成事件处理
+    public class A
+    {
+        public delegate void EventHandler(object sender);
+        public event EventHandler a;
+
+        public void Run()
+        {
+            Console.WriteLine("Trigger an event.");
+            a(this);
+        }
+    }
+
+    class B
+    {
+        public B(A a)
+        {
+            a.a += new A.EventHandler(this.b);
+        }
+        private void b(object sender)
+        {
+            Console.WriteLine("Received and handled an event." );
+            Console.Read();
+        }
+    }

@@ -1,0 +1,12 @@
+三、利用RequireComponent添加一个组件。
+using UnityEngine;
+using System.Collections;
+[RequireComponent(typeof(PlayerCharacterController))]
+[RequireComponent(typeof(PlayerCharacterUI))]
+[RequireComponent(typeof(PlayerQuestManager))]
+[RequireComponent(typeof(PlayerSave))]
+
+public class PlayerManager : MonoBehaviour {
+}
+
+RequireComponent意思是表面这个类一定需要哪些组件，如果目前这些组件没有被加上，就自动加上。

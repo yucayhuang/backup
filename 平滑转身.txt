@@ -1,0 +1,45 @@
+平滑转身函数
+void Rotating(float horizontal, float vertival)  
+    {  
+        Vector3 targetDirection = new Vector3 (horizontal, 0f, vertival);  
+        // Create a rotation based on this new vector assuming that up is the global y axis.  
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection, Vector3.up);  
+          
+        // Create a rotation that is an increment closer to the target rotation from the player's rotation.  
+        Quaternion newRotation = Quaternion.Lerp(rigidbody.rotation, targetRotation, turnSmoothing * Time.deltaTime);  
+          
+        // Change the players rotation to this new rotation.  
+        rigidbody.MoveRotation(newRotation);  
+    }  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ps:
+// Interpolates rotation between the rotations
+// of from and to.
+// (Choose from and to not to be the same as
+// the object you attach this script to)
+//在from和to之间插值旋转.
+//(from和to不能与附加脚本的物体相同)
+var from : Transform;
+var to : Transform;
+var speed = 0.1;
+function Update () {
+	transform.rotation =
+	Quaternion.Lerp (from.rotation, to.rotation, Time.time * speed);
+}

@@ -1,0 +1,35 @@
+	private void getSeverData(){
+		TextAsset txt = Resources.Load<TextAsset> ("text/FiremenData");
+		FiremenInfoList datas = JsonUtility.FromJson<FiremenInfoList>(txt.text);
+		firemenDatas = datas.fList;
+
+		foreach(FiremenInfo fData in firemenDatas){}
+	}
+
+
+
+
+
+
+
+
+[Serializable]
+public class FiremenInfoList {
+	public List<FiremenInfo> fList;
+}
+
+[Serializable]
+public class FiremenInfo{
+	public int id;
+	public string name;
+}
+
+
+
+
+
+
+
+Resource/text/FiremenData.json
+{"fList" :[{"id":1, "state":1},{"id":2, "state":2}]}
+

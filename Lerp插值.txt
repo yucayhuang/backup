@@ -1,0 +1,20 @@
+插值运算不仅仅可以作为位置、旋转、缩放等计算，还可以做为灯光亮度等的差值计算，
+也就是说只要是从一个确定状态渐进过渡到另一个确定状态的计算，都可以用到插值运算。
+
+位置插值：三维向量
+Vector3 targetpostion = player.position + new Vector3(0, 2.42f, -2.42f);
+transform.position = Vector3.Lerp(transform.position, targetpostion, speed * Time.deltaTime);
+
+旋转插值：三维角度
+Quaternion targetrotation = Quaternion.LookRotation(player.position - transform.position);
+transform.rotation = Quaternion.Slerp(transform.rotation, targetrotation, speed * Time.deltaTime);
+
+灯光亮度插值:浮点值
+public float newIntensity = 5;
+light.intensity = Mathf.Lerp(light.intensity, newIntensity, speed * Time.deltaTime);//light.intensity位当前灯光的值
+
+颜色插值：
+Color.Lerp(currentColor, newColor, speed * Time.deltaTime);
+
+
+其他比如Material.Lerp、Mathf.InverseLerp等，可以通过查手册了解。

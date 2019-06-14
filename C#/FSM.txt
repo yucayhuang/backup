@@ -1,0 +1,47 @@
+StartCoroutine("FSM");
+
+
+PeopleState state = PeopleState.idle;
+	int myPower = 0;
+
+	IEnumerator FSM(){
+		Debug.Log("FSM Start");
+		while (true) {
+			switch (state) {
+			case PeopleState.idle:
+				idle ();
+				break;
+			case PeopleState.walk:
+				walk ();
+				break;
+			case PeopleState.run:
+				run ();
+				break;
+			default:
+				break;
+			}
+
+			yield return null;
+		}
+	}
+
+	void idle(){
+		Debug.Log("idle");
+		myPower++;
+		if (myPower > 10)
+			state = PeopleState.walk;
+	}
+
+	void walk(){
+		Debug.Log("walk");
+	}
+
+	void run(){
+		Debug.Log("run");
+	}
+}
+enum PeopleState{
+	idle,
+	walk,
+	run
+}

@@ -1,0 +1,17 @@
+Static Batching
+	在编辑器里选中不会移动的物体，并标记为static即可，引擎会在编译期合并这些mesh，使他们一次画出。
+	运行期进行动态Static batching: StaticBatchingUtility.Combine(StaticBatchingRoot);
+
+
+
+
+Dynamic Batching
+	动态物体共用着相同的材质，那么Unity会自动对这些物体进行批处理，而且动态批处理操作是自动完成的，并不需要你进行额外的操作。
+
+
+
+
+Occlusion Culling
+	使用勾选了摄像器的Occlusion Culling
+	将能被遮挡的游戏对象在Inspect属性面板上设置为静态（Occluder一定要勾选，其他可以不勾选）
+	接下来打开Wndow->Occlusion Culling，最后烘焙下(Bake按钮)

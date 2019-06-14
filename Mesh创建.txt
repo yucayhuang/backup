@@ -1,0 +1,67 @@
+using UnityEngine;
+using System.Collections;
+
+public class CreateMesh : MonoBehaviour {
+
+    private MeshFilter filter;
+    private Mesh mesh;
+
+    // Use this for initialization
+    void Start () {
+        // 获取GameObject的Filter组件
+        filter = GetComponent<MeshFilter>();
+        // 并新建一个mesh给它
+        mesh = new Mesh();
+        filter.mesh = mesh;
+
+        // 初始化网格
+        InitMesh();
+    }
+    
+    // Update is called once per frame
+    void Update () {
+    
+    }
+
+    /// <summary>
+    /// Inits the mesh.
+    /// </summary>
+    void InitMesh()
+    {
+        mesh.name = "MyMesh";
+
+        // 为网格创建顶点数组
+        Vector3[] vertices = new Vector3[4]{
+            new Vector3(1, 1, 0),
+            new Vector3(-1, 1, 0),
+            new Vector3(1, -1, 0),
+            new Vector3(-1, -1, 0)
+        };
+
+        mesh.vertices = vertices;
+
+        // 通过顶点为网格创建三角形
+        int[] triangles = new int[2 * 3]{
+            0, 3, 1, 　　0, 2, 3
+        };
+
+        mesh.triangles = triangles;
+    }
+}
+
+
+3.网格已经成功生成，接下来该给网格贴图了，在Inspector视图里选中Mesh Render，并拖一个材质给它，
+
+Mesh Render是负责渲染的，将Mesh Filter里的mesh通过自身的Materials渲染出来。
+
+设置完材质后，我们需要将纹理贴图与网格顶点一一对应起来，这样才能渲染出来。
+
+// 为mesh设置纹理贴图坐标
+        Vector2[] uv = new Vector2[4]{
+            new Vector2(1, 1),
+            new Vector2(0, 1),
+            new Vector2(1, 0),
+            new Vector2(0, 0)
+        };
+
+        mesh.uv = uv;

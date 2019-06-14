@@ -1,0 +1,41 @@
+发布出来之后是1个html+2个文件夹
+
+
+
+Unity场景中播放视频可以通过在3D的Cube面上添加MovieTexture得来，但在最终生成WebGL应用时会报错，原因是Web端不支持MovieTexture的播放，.首先需要下载一个名为Simple MovieTextures for Unity WebGL的Unity插件 (使用WebGLMovieTexture)
+
+
+
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Firemen</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>  
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/myUnity.json", {onProgress: UnityProgress});
+    
+	
+	function SayHello(msg){
+			alert(msg);
+			
+			gameInstance.SendMessage(msg, "SayHelloFromJs", "yoyoyo");
+		}
+	</script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="gameContainer" style="width: 960px; height: 600px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+        <div class="title">Firemen</div>
+      </div>
+    </div>
+  </body>
+</html>

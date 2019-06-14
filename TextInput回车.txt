@@ -1,0 +1,4 @@
+	void OnGUI() {
+		if (Event.current.Equals(Event.KeyboardEvent("return")) && GUI.GetNameOfFocusedControl().Equals("TextInput")) {
+			ProcessInput();
+		}

@@ -1,0 +1,5 @@
+Input.GetAxis("Mouse X")
+
+Input.GetAxis("Mouse Y")
+
+Input.GetAxis("Mouse ScrollWheel")

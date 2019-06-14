@@ -1,0 +1,15 @@
+public enum FruitName{
+	Apple = 1,
+	banana = 2
+}
+
+public class Fruit {
+	public string name;
+}
+
+public class Shop {
+	private Fruit[] _fruits;
+	public void Awark(){
+		_fruits = new Fruit[ Enum.GetValues(typeof()).Length ];
+	}
+}

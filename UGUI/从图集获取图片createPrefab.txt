@@ -1,0 +1,89 @@
+-- Atlas
+---- Main
+------ image0
+------ image1
+
+-- Resources
+---- Sprite
+------ image0(prefab)
+------ image1(prefab)
+
+
+
+
+
+
+
+
+
+
+[MenuItem ("MyMenu/AtlasMaker")]
+	static private void MakeAtlas()
+	{
+		string spriteDir = Application.dataPath +"/Resources/Sprite";
+		
+		if(!Directory.Exists(spriteDir)){
+			Directory.CreateDirectory(spriteDir);
+		}
+ 
+		DirectoryInfo rootDirInfo = new DirectoryInfo (Application.dataPath +"/Atlas");
+		foreach (DirectoryInfo dirInfo in rootDirInfo.GetDirectories()) {
+			foreach (FileInfo pngFile in dirInfo.GetFiles("*.png",SearchOption.AllDirectories)) {
+				string allPath = pngFile.FullName;
+				string assetPath = allPath.Substring(allPath.IndexOf("Assets"));
+				Sprite sprite = Resources.LoadAssetAtPath<Sprite>(assetPath);
+				GameObject go = new GameObject(sprite.name);
+				go.AddComponent<SpriteRenderer>().sprite = sprite;
+				 allPath = spriteDir+"/"+sprite.name+".prefab";
+				string prefabPath = allPath.Substring(allPath.IndexOf("Assets"));
+				PrefabUtility.CreatePrefab(prefabPath,go);
+				GameObject.DestroyImmediate(go);
+			}
+		}	
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+然后是运行时的代码。
+
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+ 
+public class UIMain : MonoBehaviour {
+ 
+	void Start () 
+	{
+		CreatImage(loadSprite("image0"));
+		CreatImage(loadSprite("image1"));
+	}
+ 
+	private void CreatImage(Sprite sprite ){
+		GameObject go = new GameObject(sprite.name);
+		go.layer = LayerMask.NameToLayer("UI");
+		go.transform.parent = transform;
+		go.transform.localScale= Vector3.one;
+		Image image = go.AddComponent<Image>();
+		image.sprite = sprite;
+		image.SetNativeSize();
+	}
+ 
+	private Sprite loadSprite(string spriteName){
+		return Resources.Load<GameObject>("Sprite/" + spriteName).GetComponent<SpriteRenderer>().sprite;
+	}
+ 
+}
+因为这两个图是在同一个图集上，所以drawcall就是1了。这样我们就可以根据图片的名子来运行时加载图片了。

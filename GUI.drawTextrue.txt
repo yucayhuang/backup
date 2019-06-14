@@ -1,0 +1,43 @@
+// 本行为GUI.tooltip提供了字符串“This is the tooltip”
+02	
+ 
+03	
+　　GUI.Button (Rect (10,10,100,20), GUIContent (“Click me”,
+04	
+ 
+05	
+　　“This is the tooltip”));
+06	
+ 
+07	
+　　// 本行读取GUI.tooltip的内容并显示了GUI.tooltip的内容
+08	
+ 
+09	
+　　GUI.Label (Rect (10,40,100,20), GUI.tooltip);
+10	
+ 
+11	
+　　同时为控件提供字符串，图标和一个提示信息
+12	
+ 
+13	
+　　GUI.Button (Rect (10,10,100,20), GUIContent (“Click me”,
+14	
+ 
+15	
+　　icon, “This is the tooltip”));
+16	
+ 
+17	
+　　GUI.Label (Rect (10,40,100,20), GUI.tooltip);
+18	
+
+单独画一张图片：
+  	 	
+1	
+//绘制一个背景图片，坐标X等于、Y等于、宽度等于场景的宽度、高度等于场景的高度，绘制的对象是backGround所指定的材质图片
+2	
+ 
+3	
+　　GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), backGround);

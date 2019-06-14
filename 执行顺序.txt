@@ -1,0 +1,1 @@
+Awake()->OnEnable()->Start()->Update()->LateUpdate()->OnGUI()->OnDisable()->OnDestroy() 

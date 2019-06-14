@@ -1,0 +1,5 @@
+from.position = Vector3.Lerp(from.position, to.position, Time.deltaTime);
+
+或者想要快一些我就这样：
+
+from.position = Vector3.Lerp(from.position, to.position, Time.deltaTime * 2f);

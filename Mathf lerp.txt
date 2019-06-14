@@ -1,0 +1,5 @@
+在一秒内从min匀速渐变到max
+
+function update(){
+	transform.position = Vector3(Mathf.Lerp(0, 100, Time.time), 0, 0);
+}

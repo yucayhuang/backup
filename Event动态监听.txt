@@ -1,0 +1,157 @@
+ 1 using System.Collections.Generic;
+ 2 using UnityEngine;
+ 3 using UnityEngine.Events;
+ 4 using UnityEngine.EventSystems;
+ 5 
+ 6 public class ScriptControl : MonoBehaviour {
+
+ 8     // Use this for initialization
+ 9     void Start ()
+10     {
+11         var trigger = transform.gameObject.GetComponent<EventTrigger>();
+12         if (trigger == null)
+13             trigger = transform.gameObject.AddComponent<EventTrigger>();
+14 
+15         // 实例化delegates
+16         trigger.delegates = new List<EventTrigger.Entry>();
+17 
+18         // 定义需要绑定的事件类型。并设置回调函数
+19         EventTrigger.Entry entry = new EventTrigger.Entry();
+20         // 设置 事件类型
+21         entry.eventID = EventTriggerType.PointerClick;
+22         // 设置回调函数
+23         entry.callback = new EventTrigger.TriggerEvent();
+24         UnityAction<BaseEventData> callback = new UnityAction<BaseEventData>(OnScriptControll);
+25         entry.callback.AddListener(callback);
+26         // 添加事件触发记录到GameObject的事件触发组件
+27         trigger.delegates.Add(entry);
+28     }
+29     
+30     // Update is called once per frame
+31     void Update () {
+32     
+33     }
+34 
+35     public void OnScriptControll(BaseEventData arg0)
+36     {
+37         Debug.Log("Test Click");
+38     }
+39 
+40 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Unity给3D物体添加点击事件脚本
+
+本段主要是为了学习记录，在Unity中怎么给一个BoxCollider添加事件脚本，以点击事件为例，并且，添加物体事件一些必要的前提。
+
+首先是射线检测部分，如下类 AddEeventMonoTest.cs, 其中初始化阶段准备了 必要的一些组件，相机的射线检测组件PhysicsRaycaster，以及事件系统的两个组件（EventSystem,StandaloneInputModule），但是事件相关的这俩组件未必需要绑定到Camera上，任意激活对象上都行。
+
+如下具体实现是给一个Cube添加点击事件的逻辑：
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+/// <summary>
+/// 给指定的BoxCollider添加点击事件
+/// </summary>
+public class AddEeventMonoTest : MonoBehaviour
+{
+
+    public GameObject targetGameObject;
+
+    // Use this for initialization
+    void Start()
+    {
+        targetGameObject = GameObject.Find("Cube");
+
+        //Camera上必须要有 PhysicsRaycaster,EventSystem,StandaloneInputModule 组件
+        if (this.gameObject.GetComponent<PhysicsRaycaster>() == null)
+        {
+            gameObject.AddComponent<PhysicsRaycaster>();
+        }
+
+        if (this.gameObject.GetComponent<EventSystem>() == null)
+        {
+            this.gameObject.AddComponent<EventSystem>();
+        }
+
+        if (this.gameObject.GetComponent<StandaloneInputModule>() == null)
+        {
+            gameObject.AddComponent<StandaloneInputModule>();
+        }
+    }
+
+    /// <summary>
+    /// 添加组件，BoxCollider，CubeEventItemBind，EventTrigger 和事件函数
+    /// </summary>
+    /// <param name="itemObject"></param>
+    public void AddObjectClickEvent(GameObject itemObject)
+    {
+        var box = itemObject.GetComponent<BoxCollider>();
+        if (box == null)
+        {
+            box = itemObject.AddComponent<BoxCollider>();
+        }
+
+        var item = itemObject.GetComponent<CubeEventItemBind>();
+        if (item == null)
+            item = itemObject.AddComponent<CubeEventItemBind>();
+        item.paramStr = "哈哈";
+
+        EventTrigger trigger = itemObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = itemObject.AddComponent<EventTrigger>();
+
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        UnityEngine.Events.UnityAction<BaseEventData> click = new UnityEngine.Events.UnityAction<BaseEventData>(item.OnClickCubeItem);
+        entry.callback.AddListener(click);
+
+        trigger.triggers.Clear();
+        trigger.triggers.Add(entry);
+    }
+
+    private void OnGUI()
+    {
+        if (GUILayout.Button("给 GameObject=" + targetGameObject + ",添加点击事件！！"))
+        {
+            Debug.Log("给 " + targetGameObject + ",添加事件");
+            AddObjectClickEvent(targetGameObject);
+        }
+    }
+}
+
+然后，Cube上负责接收事件的脚本：
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+/// <summary>
+/// function:具体  cube上 的点击响应事件
+/// </summary>
+public class CubeEventItemBind : MonoBehaviour {
+
+    public string paramStr = "";
+
+    public void OnClickCubeItem(UnityEngine.EventSystems.BaseEventData data = null)
+    {
+        Debug.Log("点击了cube tran=" + transform.name + ",paramStr=" + paramStr);
+    }
+}

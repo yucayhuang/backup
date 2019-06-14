@@ -1,0 +1,14 @@
+
+
+	void Start(){
+		Invoke("SpawnObject", 2);		//一次
+		InvokeRepeating("SpawnObject", 2, 1);	//重复
+
+		//取消
+		CancelInvoke();
+		CancelInvoke("SpawnObject");
+	}
+
+	void SpawnObject(){
+		Instantiate(target, new Vector3(x,y,z), Quaternion.identity);
+	}

@@ -1,0 +1,48 @@
+array:
+string[] str = {"sss", "vvvv"};
+str.Length;
+str.IndexOf("sss");
+
+//克隆
+int[] aa = {1,3,4,6};  
+int[] cc = aa.Clone();
+int[] bb = new int [8];    
+Array.Copy(aa,bb,3); 
+// 输出bb数组，结果是: 1,3,4,6,0,0,0,0
+
+
+List:
+string[] temArr = { "Ha", "Hunter", "Tom", "Lily", "Jay", "Jim", "Kuku", "Locu"};
+List<string> testList = new List<string>(temArr);
+
+mList.Add("John");
+
+string[] temArr = {"Ha","Hunter","Tom","Lily","Jay","Jim","Kuku","Locu"};
+mList.AddRange(temArr);
+
+mList.Count();
+
+mList.Insert(1,"Hei");
+
+mList.Remove("Hunter");
+mList.RemoveAt(0);
+list.GetRange(index, count);
+mList.RemoveRange(3, 2);
+mList.Clear();
+
+List. Contains(T item)
+
+List. Reverse ()
+mList.Sort();
+var result1 = lst.OrderBy(a => a.Total);
+var result3 = lst.OrderBy(a => a.Total).ThenBy(a => a.Name);
+var result2 = lst.OrderByDescending(a => a.Total).ThenByDescending(a => a.Name);
+
+mList.toArray();
+
+
+
+
+
+
+ var cars = new List<Car> { new Car(), new ConvertibleCar(),      new Minivan() }; 

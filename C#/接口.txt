@@ -1,0 +1,17 @@
+interface IControl
+{
+	void Pain();
+	int width{get;set;}
+}
+
+interfact IListBox:IControl
+{
+	void SetItems(string[] items);
+}
+
+
+
+
+//Р§зг
+class Stundent : Person, IHomeworkCollector,IReadBook
+{

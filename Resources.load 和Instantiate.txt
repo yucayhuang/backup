@@ -1,0 +1,31 @@
+
+Resources.load 和Instantiate 的理解
+
+1 Resources.load 是将物体加载到内存中去，资源必须放在Resources目录下(Resources中的所有资源，都会被打到客户端中)
+2 Instantitate  是在Unity 中生成该物体，之后场景中就会出现该物体
+
+
+ep1:
+
+Object SliderPrefab = Resources.Load("Prefabs/Slider") as Object;
+if (SliderPrefab != null)
+	GameObject Slider = Instantiate(SliderPrefab) as GameObject;
+
+
+
+ep2:
+
+// cube.mat 与 cube.prefab重名，所以加载时要指定类型
+    Object objMat = Resources.Load("Materials\cube", typeof(Material));
+
+    Object objGO = Resources.Load("Prefabs\cube", typeof(GameObject));
+
+    GameObject go = Instantiate(objGO) as GameObject;
+    go.getComponent<MeshRenderer>().material = objMat;
+
+
+
+
+个人理解：
+Resources.load将素材加载到内存中，Instantitate再将内存中的实例化。
+gameObject需要实例化，而material、sprite只需内存共用一份

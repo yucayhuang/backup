@@ -1,0 +1,14 @@
+public enum ActionState  
+{  
+    Attack_1,  
+    Attack_2,  
+    Attack_3_1,  
+    Attack_3_2,  
+    Attack_3_3,  
+    Attack_4,  
+    Fire,  
+    Jump,  
+    Run,  
+    Idle  
+}  
+private ActionState actionState = ActionState.Idle;  

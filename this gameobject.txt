@@ -1,0 +1,6 @@
+Weapon.java
+
+
+destroy(this); //销毁 该武器的 weapon类组件
+
+destroy(this.gameObject);//销毁 weapon类组件 绑定的 该武器 

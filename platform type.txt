@@ -1,0 +1,2 @@
+isPhone = Application.platform == RuntimePlatform.Android || 
+			Application.platform == RuntimePlatform.IPhonePlayer;

@@ -1,0 +1,128 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class FSM {
+
+    // 定义函数指针类型
+    public delegate void FSMTranslationCallfunc();   
+ 
+    /// <summary>
+    /// 状态类
+    /// </summary>
+    public class FSMState
+    {
+        public string name;
+        public FSMState(string name){
+            this.name = name;
+        }
+        /// <summary>
+        /// 存储事件对应的条转
+        /// </summary>
+        public Dictionary <string,FSMTranslation> TranslationDict = new Dictionary<string,FSMTranslation>();
+    }
+
+    /// <summary>
+    /// 跳转类
+    /// </summary>
+    public class FSMTranslation
+    {
+	public string name;
+        public FSMState fromState;
+        public FSMState toState;
+        public FSMTranslationCallfunc callfunc; // 回调函数
+
+        public FSMTranslation(FSMState fromState, string name, FSMState toState, FSMTranslationCallfunc callfunc){
+	    this.name = name;
+            this.fromState = fromState;
+            this.toState   = toState;
+            this.callfunc = callfunc;
+        }
+    }
+
+    // 当前状态
+    private FSMState mCurState;
+
+    Dictionary <string,FSMState> StateDict = new Dictionary<string,FSMState>();
+
+    /// <summary>
+    /// 添加状态
+    /// </summary>
+    /// <param name="state">State.</param>
+    public void AddState(FSMState state)
+    {
+        StateDict [state.name] = state;
+    }
+
+    /// <summary>
+    /// 添加条转
+    /// </summary>
+    /// <param name="translation">Translation.</param>
+    public void AddTranslation(FSMTranslation translation)
+    {
+        StateDict [translation.fromState.name].TranslationDict [translation.name] = translation;
+    }
+
+    /// <summary>
+    /// 启动状态机
+    /// </summary>
+    /// <param name="state">State.</param>
+    public void Start(FSMState state)
+    {
+        mCurState = state;
+    }
+
+    /// <summary>
+    /// 处理事件
+    /// </summary>
+    /// <param name="name">Name.</param>
+    public void HandleEvent(string name)
+    {
+        if (mCurState != null && mCurState.TranslationDict.ContainsKey(name)) {
+            Debug.LogWarning ("fromState:" + mCurState.name);
+
+            mCurState.TranslationDict [name].callfunc ();
+            mCurState = mCurState.TranslationDict [name].toState;
+
+
+            Debug.LogWarning ("toState:" + mCurState.name);
+        }
+    }
+}
+
+
+测试代码(需自行修改):
+
+//        Idle,               闲置
+//        Run,                跑
+//        Jump,               一段跳
+//        DoubleJump,         二段跳
+//        Die,                挂彩
+
+        // 创建状态
+        FSM.FSMState idleState = new FSM.FSMState("idle");
+        FSM.FSMState runState  = new FSM.FSMState("run");
+        FSM.FSMState jumpState = new FSM.FSMState("jump");
+        FSM.FSMState doubleJumpState = new FSM.FSMState("double_jump");
+        FSM.FSMState dieState  = new FSM.FSMState("die");
+        // 创建跳转
+        FSM.FSMTranslation touchTranslation1 = new FSM.FSMTranslation(runState,"touch_down",jumpState,Jump);
+        FSM.FSMTranslation touchTranslation2 = new FSM.FSMTranslation(jumpState,"touch_down",doubleJumpState,DoubleJump);
+
+        FSM.FSMTranslation landTranslation1 = new FSM.FSMTranslation(jumpState,"land",runState,Run);
+        FSM.FSMTranslation landTranslation2 = new FSM.FSMTranslation(doubleJumpState,"land",runState,Run);
+
+        // 添加状态
+        PlayerModel.Instance ().fsm.AddState (idleState);
+        PlayerModel.Instance ().fsm.AddState (runState);
+        PlayerModel.Instance ().fsm.AddState (jumpState);
+        PlayerModel.Instance ().fsm.AddState (doubleJumpState);
+        PlayerModel.Instance ().fsm.AddState (dieState);
+
+        // 添加跳转
+        PlayerModel.Instance ().fsm.AddTranslation (touchTranslation1);
+        PlayerModel.Instance ().fsm.AddTranslation (touchTranslation2);
+        PlayerModel.Instance ().fsm.AddTranslation (landTranslation1);
+        PlayerModel.Instance ().fsm.AddTranslation (landTranslation2);
+
+        PlayerModel.Instance ().fsm.Start (runState);

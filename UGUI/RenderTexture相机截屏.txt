@@ -1,0 +1,92 @@
+创建拍摄用的摄像机
+创建RenderTexture并绑定到摄像机camera.targetTexture上
+RenderTexture绑定到rawImage.texture上（rawImage见上图）
+创建显示的模型，相机可见
+注意Destroy销毁 创建出来的RenderTexture 和相机
+注意模型上的粒子特效由于Alpha透明通道，显示会有一点问题，可以通过Shader Blend混合处理，挂载在rawImage上。
+
+public void CreateCamera(Vector3 pos, Vector3 rot, int width, int height, string layerName, float size)
+{
+    // 创建拍摄用的摄像机
+    GameObject go = new GameObject("ModelCamera");
+    _camera = go.AddComponent<Camera>();
+    _camera.clearFlags = CameraClearFlags.SolidColor;
+    _camera.transform.position = pos;
+    _camera.transform.rotation = Quaternion.Euler(rot);
+    _camera.cullingMask = LayerMask.GetMask(layerName);
+    _camera.orthographic = true;
+    _camera.orthographicSize = size;
+    _camera.backgroundColor = new Color(0,0,0,0);
+
+    // 创建RenderTexture并绑定到摄像机上
+    _renderTexture = new RenderTexture(width, height, 8);
+    _camera.targetTexture = _renderTexture;
+
+    if (_rawImage != null)
+    {
+        _rawImage.texture = _renderTexture;
+    }
+}
+
+2. Camera相机拍照分享，保存为jpg
+private IEnumerator CameraPhoto(Camera cam, Rect rect, string name) {
+    if (rt == null) {
+        rt = RenderTexture.GetTemporary(renderTextureDesc);
+    }
+    cam.targetTexture = rt;
+    cam.Render();
+
+    RenderTexture currentActiveRT = RenderTexture.active;
+    RenderTexture.active = rt;
+    Texture2D screenShot = new Texture2D((int)rect.width, (int)rect.height, TextureFormat.RGB24, false);
+    screenShot.ReadPixels(rect, 0, 0); //读取缓冲区像素信息 
+    screenShot.Apply();
+    yield return new WaitForEndOfFrame();
+
+    cam.targetTexture = null;
+    RenderTexture.active = currentActiveRT;
+
+    byte[] bytes = screenShot.EncodeToJPG();
+    string file = Application.dataPath + "/Texture/" + name;
+    System.IO.File.WriteAllBytes(file, bytes);
+}
+PS：yield语句要放在设置RenderTexture.active之前，因为只有在帧结束时shotCam的targetTexture才被正确渲染，才可以通过ReadPixels取得正确的图像。tex在使用过后最好使用Destroy()销毁，或者在设置mainTexture之前销毁之前的Texture，否则就会像博主一样写着写着博客发现Unity运行了一段时间就把内存吃光
+
+Rendertexture的分配和销毁上有一个地方需要注意：
+如果频繁的要new一个rt出来，那么不要直接new，而是使用RenderTexture提供的GetTemporary和ReleaseTemporary，它将在内部维护一个池，反复重用一些大小格式一样的rt资源，因为让GPU为你分配一个新的texture其实是要耗时间的。
+EncodeToJPG 生成的图片体积更小
+
+
+
+
+
+
+
+
+
+
+
+
+public GameObject[] gos;
+void Start()
+{
+    for (int i = 0; i < textures.Length; i++)
+    {
+        GameObject go = Instantiate(gos[i]);
+        go.SetActive(true);
+        textures[i].mainTexture = RenderGoTex();
+        GameObject.Destroy(go);//这里应该，DestroyImmediate()，或者先调用gameObject.SetActive(false)后再Destroy()
+    }
+}
+Texture2D RenderGoTex()
+{
+    RenderTexture rt = shotCam.targetTexture;
+    shotCam.Render();
+    RenderTexture.active = rt;
+    Debug.Log(RenderTexture.active);
+    Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false);
+    tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+    tex.Apply();
+    return tex;
+}
+Camera.Render()无需等待帧结束，它在调用时强制渲染相机，通过返回的tex进行操作即可

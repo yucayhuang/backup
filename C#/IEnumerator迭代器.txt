@@ -1,0 +1,9 @@
+int[] array=new int[]{1,2,3};
+
+IEnumerator e=array.GetEnumerator();
+
+while(e.MoveNext()){
+
+print(Current);
+
+}

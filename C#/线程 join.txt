@@ -1,0 +1,15 @@
+可以通过调用Join方法来等待另一个线程结束，例如：
+
+static void Main()
+{
+  Thread t = new Thread (Go);
+  t.Start();
+  t.Join();
+  Console.WriteLine ("Thread t has ended!");
+}
+
+static void Go()
+{
+  for (int i = 0; i < 1000; i++) Console.Write ("y");
+}
+输出 “ y “ 1,000 次之后，紧接着会输出 “ Thread t has ended! “。当调用Join时可以使用一个超时参数，以毫秒或是TimeSpan形式。如果线程正常结束则返回true，如果超时则返回false。

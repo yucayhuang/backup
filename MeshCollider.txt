@@ -1,0 +1,4 @@
+	this.meshCollider = GetComponent<MeshCollider>();
+	
+	this.meshFilter.mesh = m;
+	this.meshCollider.sharedMesh = m;

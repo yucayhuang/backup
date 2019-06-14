@@ -1,0 +1,19 @@
+A.as
+
+namespace {
+	public class A {
+
+
+
+		public class B {}
+
+	}
+
+}
+
+
+
+
+class C {
+	B b = new A.B();
+}

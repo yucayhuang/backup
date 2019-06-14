@@ -1,0 +1,21 @@
+public class Enemy {
+
+	void OnDeath () {
+		Destroy ( gameObject);
+	}
+}
+
+
+
+public class EnemyDeath : MonoBehaviour {
+
+	public GameObject enemy;
+
+	void OnTriggerEnter ( Collider collider ) {
+		if( collider.gameObject.tag == "Player" )
+			enemy.SendMessage( "OnDeath" );
+	}
+}
+
+
+Ps:既然enmey是该脚本的父，可以使用 gameObject.SendMessageUpwards("OnDeath");

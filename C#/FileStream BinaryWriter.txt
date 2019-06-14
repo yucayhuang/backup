@@ -1,0 +1,10 @@
+	void WriteSimpleObjects(){
+		using(FileStream fs = File.OpenWrite(saveFilePath)){
+			SimpleObject[] simpleObjects = UnityEngine.Object.FindObjecsOfType<SimpleObject>();
+			BinaryWriter fileWriter = new BinaryWriter(fs);
+			fileWriter.Write(simpleObjects.Length);
+			foreach(SimpleObject simpleObject in simpleObjects){
+				fileWriter.Write(simpleObject.name);
+			}
+		}
+	}

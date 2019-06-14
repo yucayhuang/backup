@@ -1,0 +1,1 @@
+ var myLight : Light = gameObject.Find("Light").GetComponent(Light);

@@ -1,0 +1,5 @@
+	render2D = GetComponent<SpriteRender>();
+	//X轴翻转
+	render2D.flipX = true;
+	//X轴翻转 还原
+	render2D.flipX = false;

@@ -1,0 +1,3 @@
+1. 全选要打包的texture
+	命名一个属性packing tag
+2. 打开window ，sprite packer， 点击pack

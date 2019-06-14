@@ -1,0 +1,30 @@
+
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+ 
+public class UIDepth : MonoBehaviour {
+	public int order;
+	public bool isUI = true;
+	void Start () 
+	{
+		if(isUI){
+			Canvas canvas = GetComponent<Canvas>();
+			if( canvas == null){
+				canvas = gameObject.AddComponent<Canvas>();
+			}
+			canvas.overrideSorting = true;
+			canvas.sortingOrder = order;
+		}
+		else
+		{
+			Renderer []renders  =  GetComponentsInChildren<Renderer>();
+ 
+			foreach(Renderer render in renders){
+				render.sortingOrder = order;
+			}
+		}
+	}
+}
+原理就是设置 sortingOrder ，给需要修改order的UI元素挂上UIDepth脚本 。
+如下图所示，在UI容器中设置order。

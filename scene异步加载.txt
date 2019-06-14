@@ -1,0 +1,7 @@
+//“Ï≤Ωº”‘ÿ
+    IEnumerator LoadScene()
+    {
+        async = Application.LoadLevelAsync("Next");
+        yield return async;
+        Debug.Log("Complete!");
+    }

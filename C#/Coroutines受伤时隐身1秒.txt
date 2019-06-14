@@ -1,0 +1,48 @@
+public class Player {
+
+	private void OnDamage() {
+		if(isWeek)
+			return;
+		StartCoroutine( WeekDelay() );
+		Health --;
+	}
+
+	private IEmunerator WeekDelay(){
+		isWeek = true;
+		yield return new WaitForSeconds (1.0f);
+		isWeek = false;
+	}
+	
+	
+	
+ 即协程是一个分部执行，遇到条件（yield return 语句）会挂起，直到条件满足才会被唤醒继续执行后面的代码。	
+yield return 0;null;...//等待一帧（先返回调用StartCoroutine的函数，执行其剩下部分， 等下一帧再从这个yield接着往下执行）
+yield return new WaitForSeconds(3f);//等待3s
+yield break;//退出协程
+yield return StartCoroutine();//中途执行另一个协程，执行完毕后再接着执行当前协程剩下的部分。
+特殊：
+void Start() 
+    {
+       print("Starting " +Time.time);----------------------------------------1
+       StartCoroutine(WaitAndPrint(2));-------------------------------------2 
+       print("Done " +Time.time);-------------------------------------------3 
+    }
+   IEnumerator WaitAndPrint(float waitTime) 
+    {
+       yield return new WaitForSeconds(waitTime);------------------------4 
+       print("WaitAndPrint " + Time.time);----------------------------------5
+    }
+该段代码的执行顺序是12435 
+
+IEnumerator Start() 
+    {
+       print("Starting " +Time.time);----------------------------------------1
+       yield return StartCoroutine(WaitAndPrint(2.0F));------------------------2
+       print("Done " +Time.time);------------------------------------------3 
+    }
+   IEnumerator WaitAndPrint(float waitTime) 
+    {
+       yield return new WaitForSeconds(waitTime);----------------------------4
+       print("WaitAndPrint " + Time.time);-----------------------------------------5
+    }
+该段代码的执行顺序是12453

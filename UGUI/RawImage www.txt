@@ -1,0 +1,20 @@
+public class LoadImageFromNetwork : MonoBehaviour {
+ 
+	public string url;
+ 
+	private RawImage rawImage;
+ 
+	void Start () {
+		rawImage = this.GetComponent<RawImage> ();
+		StartCoroutine (LoadImage());
+	}
+	
+	IEnumerator LoadImage()
+ 
+	{
+		WWW www = new WWW (url);
+		yield return www;
+		rawImage.texture = www.texture;
+		Debug.Log ("º”‘ÿÕÍ≥…£°");
+	}
+

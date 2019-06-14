@@ -1,0 +1,17 @@
+1.string¨C>Byte[]×ª»» 
+
+
+string strvalue ="00123aabbAA$%";
+
+byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(strvalue);//UTF8¡¢ASCII¡¢GetEncoding("GB18030")
+
+
+
+2.Byte[]¨C>string×ª»» 
+
+byte[] byteArray = new byte[100];
+
+String str = System.Text.Encoding.UTF8.GetString ( byteArray );
+//UTF8¡¢ASCII¡¢GetEncoding("GB18030")
+
+

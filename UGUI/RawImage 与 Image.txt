@@ -1,0 +1,5 @@
+Image 功能更丰富，有交互，更耗性能，使用sprite
+RawImage 使用texture
+
+
+sprite 继承于texture，比texture更丰富，可旋转，可播放动画等。

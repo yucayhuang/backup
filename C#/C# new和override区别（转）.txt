@@ -1,0 +1,139 @@
+C# new和override区别（转）
+
+override
+
+1. override是派生类用来重写基类中方法的；
+
+2. override不能重写非虚方法和静态方法；
+
+3. override只能重写用virtual、abstract、override修饰的方法；
+
+4. 不能使用修饰符 new、static、virtual 或 abstract 来修改 override 方法。
+
+new
+
+1. new是派生类用来隐藏基类中的方法的；也就是说在派生类中“看不到”基类中的方法；
+
+2. 如果要在派生类中隐藏（不是重写）基类中的方法，而没有使用new关键字，编译时会出现一个警告
+
+3. 派生类可以隐藏基类中的虚方法，也可以隐藏基类中的普通方法。
+
+4. 如果在派生类中用private来修饰new 方法，那么只在该派生类中隐藏了基类中的方法，在该派生类之外，相当于没有隐藏基类中的方法；
+
+5. 如果在派生类中隐藏了基类中的方法，在该派生类的派生类中，将延续对该派生类对基类方法的隐藏。
+
+
+
+
+
+
+
+
+
+
+
+
+new隐藏基类方法后，通过转换为基类型，仍然可以调用基类的虚方法；
+
+而override则完全将基类的方法进行了重写，即使将子类型转换为基类型，调用的仍然是重写后的方法。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+override 关键字可确保派生自 YourDerivedGraphicsClass 的任何对象都将使用 DrawRectangle 的派生类版本。派生自 YourDerivedGraphicsClass 的对象仍可以使用基关键字访问 DrawRectangle 的基类版本：
+
+?1 base.DrawRectangle(); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+个人总结：
+如果 child类 存在与 base类 同名方法，此时编译警告，并只调用base类该方法。
+这时候应该在base类方法加上virtual，
+1.  在child类用上new， 这样就可以调用child类方法（隐藏base类方法），  （base）child.fun() 调用base类方法
+2.  在child类用上override，这样就可以调用child类方法（重写base类方法）， （base）child.fun() 还是“调用”child类方法，不过可以通过在child类方法里使用base.fun()来“访问”base类方法。
+
+
+
+
+
+
+难点：
+class Car 
+{ 
+  public void DescribeCar() 
+  { 
+    System.Console.WriteLine("Four wheels and an engine."); 
+    ShowDetails(); 
+  } 
+  
+  public virtual void ShowDetails() 
+  { 
+    System.Console.WriteLine("Standard transportation."); 
+  } 
+} 
+
+class ConvertibleCar : Car 
+{ 
+  public new void ShowDetails() 
+  { 
+    System.Console.WriteLine("A roof that opens up."); 
+  } 
+} 
+
+class Minivan : Car 
+{ 
+  public override void ShowDetails() 
+  { 
+    System.Console.WriteLine("Carries seven people."); 
+  } 
+}
+
+public static void TestCars1() 
+{ 
+  
+  Car car1 = new Car(); 
+  car1.DescribeCar(); 
+  
+  ConvertibleCar car2 = new ConvertibleCar(); 
+  car2.DescribeCar(); 
+  
+  Minivan car3 = new Minivan(); 
+  car3.DescribeCar(); 
+}
+
+// ---------- 
+// Four wheels and an engine. 
+// Standard transportation. 
+// ---------- 
+// Four wheels and an engine. 
+// Standard transportation. 
+// ---------- 
+// Four wheels and an engine. 
+// Carries seven people. 
+// ----------

@@ -1,0 +1,13 @@
+unity的LayoutGroup分为三种， Horizontal Layout Group（水平布局）Vertical Layout Group（垂直布局）Grid Layout Group （网格布局）
+
+LayoutElement登场了， 用它来设置一个cell的最大或者最小宽度。
+
+		for(int i =0 ;i <10;i++){
+			GameObject go = (GameObject)Instantiate(Resources.Load<GameObject>("item"));
+			go.transform.parent = transform;
+			go.transform.localScale = Vector3.one;
+		}
+
+隐藏某一个
+		gameObject.GetComponent<LayoutElement>().ignoreLayout = true;
+		gameObject.SetActive(false);

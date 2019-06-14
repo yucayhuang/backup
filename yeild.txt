@@ -1,0 +1,20 @@
+yield return new WaitForSeconds(3.0f); // 等待3秒，然后继续从此处开始，常用于做定时器
+yield return null; // 这一帧到此暂停，下一帧再从暂停处继续，常用于循环中
+yield return new WaitForEndOfFrame(); // 等到这一帧的cameras和GUI渲染结束后再从此处继续，即等到这帧的末尾再往下运行。这行之后的代码还是在当前帧运行，是在下一帧开始前执行，跟return null很相似
+yield return new WaitForFixedUpdate(); // 在下一次执行FixedUpdate的时候继续执行这段代码，即等一次物理引擎的更新
+yield return www; // 等待直至异步下载完成
+yield break; // 直接跳出协程，对某些判定失败必须跳出的时候，比如加载AssetBundle的时候，WWW失败了，后边加载bundle没有必要了，这时候可以yield break跳出。
+yield return StartCoroutine(methodName); // 等待另一个协程执行完。这是把协程串联起来的关键，常用于让多个协程按顺序逐个运行
+
+
+
+
+
+当被调用函数执行到yield return null；（暂停协程，等待下一帧继续执行）时，根据Unity解释协同程序就会被暂停，其实我个人认为他这个解释不够精确，先返回开始协程的地方，然后再暂停协程。也就是先通知调用处，“你先走吧，不用管我”，然后再暂停协程。。
+这种StartCoroutine中嵌套一个yield return StartCoroutine,第一个StartCoroutine会等到第二个StartCoroutine中所有代码结束后再继续执行，而第二个StartCoroutine中的yield语句会先返回第一个，然后立即返回他的调用处，也就是调用处会继续执行，而第一个StartCoroutine会等待第二个执行完再继续执行。
+
+
+
+
+
+yield WaitForSecond(5);//等待5s钟之后再次返回执行。

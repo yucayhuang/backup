@@ -1,0 +1,37 @@
+//ÕÊº“ºÒµΩŒ‰∆˜£¨œ≈≈‹À˘”–π÷ ﬁ
+
+public class PickWeaponController : MonoBehaviour {
+
+	public delegate void PickWeaponAction ( GameObject weapon );
+	public PickWeaponAction onPickWeapon;
+
+	void OnTriggerEnter( Collider collider ) {
+		if( collider.gameObject.tag == "Weapon" ){
+			if( onPickWeapon != null)
+				onPickWeapon( collider.gameObject );
+		}
+	}
+}
+
+
+public class Enemy : MonoBehaviour {
+	
+	public Player player;
+	private PickWeaponController pwController;
+
+
+	void onEnable () {
+		pwController = player.GetComponent<PickWeaponController >();
+		pwController.onPickWeapon += PlayerPickWeapon;
+	}
+
+	void onDisable () {
+		pwController.onPickWeapon  -= PlayerPickWeapon;
+	}
+
+	private void PlayerPickWeapon( GameObject weapon ) {
+		if(weapon is veryNB)
+			RunAway();
+	}
+
+	

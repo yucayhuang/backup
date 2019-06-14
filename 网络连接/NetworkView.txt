@@ -1,0 +1,172 @@
+using UnityEngine;
+using System.Collections;
+
+public class UnityServer : MonoBehaviour {
+
+    int port = 2222;//端口号
+    bool isInitialized = false;//服务器是否初始化完成
+    bool isPlayerConnected = false;
+    NetworkPlayer tempPlayer;//进入当前游戏的玩家
+    int HP = 100;
+    
+    string msg = "";//服务器端接受客户端的消息
+    
+    void OnGUI () {
+        switch (Network.peerType) {
+            case NetworkPeerType.Disconnected:
+                // 没有连接时可点击按钮创建服务器
+                StartServer();
+                break;
+            case NetworkPeerType.Server:
+                // 服务器创建成功后,开始监听客户请求
+                WaitClient();
+                break;
+            case NetworkPeerType.Client:
+                
+                break;
+            case NetworkPeerType.Connecting:
+                break;
+        }
+    }
+    
+    void StartServer () {
+        if (GUI.Button(new Rect(0,0,100,30),"创建服务器")) {
+            // 初始化服务器
+            NetworkConnectionError error = Network.InitializeServer(10,port,false);
+            Debug.LogWarning("创建服务器" + error);
+            // 公司的MasterServer
+            MasterServer.ipAddress = "115.28.227.1";
+            MasterServer.port = 23466;
+            MasterServer.RegisterHost("DouDiZhu","505");
+        }
+    }
+    
+    // 服务器初始化完成时调用以下响应函数(类似回调函数,Message)
+    void OnServerInitialized() {
+        isInitialized = true;
+        Debug.Log("Server initialized and ready");
+    }
+    
+    // 当玩家连接时，自动调用该函数(Message)
+    void OnPlayerConnected(NetworkPlayer player) {
+        isPlayerConnected = true;
+        tempPlayer = player;
+        Debug.Log("Player" + " connected from " + player.ipAddress + ":" + player.port);
+    }
+    
+    void WaitClient () {
+        if (isInitialized) {
+            GUILayout.Label("服务器已经初始化完成，等待客户端请求");
+        }
+        if (isPlayerConnected) {
+            GUILayout.Label("新玩家进入游戏: " + tempPlayer + ":" + tempPlayer.ipAddress + tempPlayer.port);
+        }
+        
+        //显示所有连接信息
+        int length = Network.connections.Length;
+        for (int i = 0; i < length; i++) {
+            GUILayout.Label("ID:" + i + "IP:" + Network.connections[i].ipAddress + "port:" + Network.connections[i].port);
+        }
+        
+        GUILayout.Label(msg);
+        if (HP >= 0) {
+            GUILayout.Label("血量: " + HP);
+        } else {
+            GUILayout.Label("血量: 0" );
+        }
+        
+        
+        if (GUI.Button(new Rect(120,0,100,30),"断开服务器")) {
+            Network.Disconnect();    
+        }
+    }
+    
+    [RPC]
+    void ReceiveMsg (string txt) {
+        //将客户端的参数赋值给服务器端
+        msg = txt;
+    }
+    
+    [RPC]
+    void BeAttacked () {
+        if (HP > 0) {
+            HP--;
+        }
+    }
+    
+}
+
+客户端脚本：
+/// <summary>
+/// Unity client.
+/// Create by Cui Yongduo
+/// date:2015-04-09 2:30
+/// </summary>
+
+using UnityEngine;
+using System.Collections;
+
+public class UnityClient : MonoBehaviour {
+
+    string IP = "172.21.60.172";    //IP地址
+    int port = 2222;    //端口号
+    
+    bool isConnectedToServer;    //是否连接成功
+    
+    // 根据不同的网络状态生成不同的界面
+    void OnGUI () {
+        switch (Network.peerType) {
+            // 公有四种网络状态
+            case NetworkPeerType.Disconnected:
+                ConnectToServer();//自定义连接服务器方法
+                break;
+            case NetworkPeerType.Client:
+                BeClient();//自定义方法
+                break;
+            case NetworkPeerType.Connecting:
+                BeConnecting();
+                break;
+            case NetworkPeerType.Server://单纯的客户端程序用不到
+                break;
+                        
+        }
+    }
+    
+    // 自定义连接服务器方法
+    void ConnectToServer () {
+        // 创建连接服务器按钮
+        if (GUI.Button(new Rect(0,0,100,30),"连接服务器")) {
+            // 调用Network类的Connect方法建立连接
+            NetworkConnectionError error = Network.Connect(IP,port);
+            Debug.LogWarning("ConnectToServer:" + error);
+            //    请求斗地主服务器
+            MasterServer.RequestHostList("DoDiZhu");
+        }
+        HostData[] hosts = MasterServer.PollHostList();
+    }
+    
+    void BeClient () {
+        GUILayout.Label("Client");
+        //客户端调用服务器端的RPC函数
+        //RPCMode.Others:调用其他所有主机的RPC函数
+        //RPCMode.OthersBuffer:调用其他所有主机的RPC函数，并写入缓存
+        networkView.RPC("ReceiveMsg",RPCMode.Server,"Hi,I'm Client!!!");
+        if (GUILayout.Button("攻击")) {
+            networkView.RPC("BeAttacked",RPCMode.Server);
+        }
+    }
+    
+    void BeConnecting () {
+        GUILayout.Label("Connecting");
+    }
+    
+    [RPC]
+    void ReceiveMsg (string txt) {
+        //注意：客户端要有和服务器端相同的RPC方法声明    
+    }
+    [RPC]
+    void BeAttacked () {
+    
+    }
+    
+}

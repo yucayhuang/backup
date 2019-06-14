@@ -1,0 +1,31 @@
+private int _score;
+
+public int Score{
+	get{ return _score; }
+	set{ _score = value; }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+public int Score{ get; set; }
+
+
+
+
+public int Score{
+	get{ return _score; }
+	private set{ _score = value; }
+
+}
+
+

@@ -1,0 +1,5 @@
+1. 通过PS 录制一个色彩调校 Action
+
+2. 在Unity目录下找到一张texture(一张对照)，导入到ps，apply 刚刚的 action， 并保存该texture
+
+3. 在camera添加color correction，设置texture为 刚刚保存的texture

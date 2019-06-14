@@ -1,0 +1,90 @@
+【服务器端】
+
+在VS创建一个C#空项目
+
+代码如下：
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.Net;
+
+namespace NetworkServer
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			/*创建一个socket对象*/
+			//寻址方式 套接字类型 协议方式
+			Socket tcpSocket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+			
+			
+			/*绑定监听消息IP和端口号*/
+			IPAddress ip = IPAddress.Parse("127.0.0.1");
+			EndPoint endPoint = new IPEndPoint(ip, 6000);
+			tcpSocket.Bind(endPoint);//向操作系统申请一个ip和端口号
+			Console.WriteLine("服务器端启动完成");
+			
+			
+			/*开始监听客户端的连接请求*/
+			tcpSocket.Listen(100);//最多可以接收100个客户端请求
+			Socket socket = tcpSocket.Accept();//暂停当前线程，知道接收到客户端发来的连接请求；当接收到客户端的连接请求后，在本地服务器创建一个socket与客户端连接，并返回出来
+			Console.WriteLine("有个客户端连接进来");
+			
+			
+			/*向客户端发送消息*/
+			string messge;
+			messge="你好,我有什么可以帮助到你吗";
+			var date=ASCIIEncoding.UTF8.GetBytes(messge);
+			socket.Send(date);
+			
+			
+			/*从客户端接收消息*/
+			byte[] bt=new byte[1024];//设置一个消息接收缓冲区
+			int message=socket.Receive(bt);//该状态处于一个暂停状态，知道接收到消息，并返回字节数
+			Console.WriteLine("接收到从客户端发来的消息:"+ASCIIEncoding.UTF8.GetString(bt));
+			
+			
+			Console.ReadLine();
+		}
+	}
+	}
+	
+	【客户端】
+	在unity下创建一个C#脚本，将其挂载在main camera上，用一个按钮触发函数
+	
+	代码如下：
+	
+	using UnityEngine;
+	using System.Collections;
+	using System.Net.Sockets;
+	using System.Net;
+	using System.Text;
+	
+	public class NetworkClient : MonoBehaviour 
+	{
+		
+		private Socket tcpSocket;
+		
+		public void OnBtnConnect()
+		{
+			//创建socket
+			tcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			
+			//连接服务器
+			tcpSocket.Connect(IPAddress.Parse("127.0.0.1"), 6000);
+			Debug.Log("连接服务器");
+			
+			//接收消息
+			byte[] bt = new byte[1024];
+			int messgeLength = tcpSocket.Receive(bt);
+			Debug.Log(ASCIIEncoding.UTF8.GetString(bt));
+			
+			//发送消息
+			tcpSocket.Send(ASCIIEncoding.UTF8.GetBytes("我有个问题"));
+		}
+	}

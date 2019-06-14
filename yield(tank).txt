@@ -1,0 +1,39 @@
+
+private float m_StartWait;//delay间隔时间，用于显示比赛开始标题
+
+private float m_EndWait;  //delay间隔时间，用于显示比赛结果
+
+
+private function Start(){
+
+	StartCorountine(GameLoop());
+}
+
+private IEnumerator GameLoop(){
+	yield return StartCoroutine(RoundStarting());
+	yield return StartCoroutine(RoundPlaying());
+	yield return StartCoroutine(RoundEnding());
+
+	if(m_GameWinner != null)
+		Application.LoadLevel(Application.loadedLevel);
+	else
+		StartCorountine(GameLoop());
+}
+
+
+private IEnumerator RoundStarting(){
+	
+	yield return m_StartWait;
+}
+
+private IEnumerator RoundPlaying(){
+	
+	while(NoOneDie){
+		yield return null;
+	}
+}
+
+private IEnumerator RoundEnding(){
+	
+	yield return m_EndWait;
+}

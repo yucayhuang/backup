@@ -1,0 +1,51 @@
+//如3秒的时间把物体移动到(4,0,0)的位置。
+ 
+iTween.MoveTo(gameObject, Vector3(2,0,0), 3);
+ 
+iTween.MoveTo(gameObject, {“x”:2, “time”:3, “loopType”:“pingPong”, “delay”:1});
+ 
+//以上两种方法都可以，第二种方法使用哈希表的形式，传递参数。
+
+
+
+
+
+
+
+
+
+
+
+
+var path = GameObject.Find(“Plane”).GetComponent(“iTweenPath”).GetPath(“myPath”);
+ 
+iTween.MoveTo(gameObject, iTween.Hash(//“position”, Vector3(0, 0, 0),
+ 
+“path”, path,
+ 
+“time”, 20,
+ 
+“easetype”, “linear”));
+
+
+
+
+
+
+
+
+
+
+
+
+private function roll(direction: String): void{
+ 
+　　……
+ 
+　　}
+ 
+　　iTween.moveTo(tweenTarget,{“x”:1.7,
+ 
+　　“onComplete”:“roll”, //函数
+ 
+　　“onCompleteParams”:“left”});//参数

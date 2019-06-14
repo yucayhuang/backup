@@ -1,0 +1,55 @@
+Unity调用PC摄像头
+
+绑定在一个带有Render组件的物体上就行了。
+
+  	 	
+01	
+    using UnityEngine;  
+02	
+    using System.Collections;  
+03	
+ 
+04	
+    public class CameraTest : MonoBehaviour {  
+05	
+ 
+06	
+        public string deviceName;  
+07	
+        WebCamTexture tex;  
+08	
+        // Use this for initialization  
+09	
+        IEnumerator Start()  
+10	
+        {  
+11	
+            //获取授权  
+12	
+            yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);  
+13	
+            if (Application.HasUserAuthorization(UserAuthorization.WebCam))  
+14	
+            {  
+15	
+                WebCamDevice[] devices = WebCamTexture.devices;  
+16	
+                deviceName = devices[0].name;  
+17	
+                tex = new WebCamTexture(deviceName, 400, 300, 12);  
+18	
+                renderer.material.mainTexture = tex;  
+19	
+                tex.Play();  
+20	
+            }  
+21	
+            else  
+22	
+            {  
+23	
+            }  
+24	
+        }   
+25	
+    }  

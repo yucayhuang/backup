@@ -1,0 +1,9 @@
+thread.Sleep(1000);
+"在未来多少毫秒内我不参与cpu竞争"
+
+thread.Sleep(0);
+"在未来0毫秒内我不参与cpu竞争"
+就是触发操作系统重新计算大家的优先级，立即重新进行一次cpu竞争。
+
+thread.Resume
+唤醒，我要参与cup竞争了

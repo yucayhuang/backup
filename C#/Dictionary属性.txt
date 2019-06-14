@@ -1,0 +1,32 @@
+count,Add,Remove,ContainsKey,Clear	
+
+
+
+	private Dictionary<string, CustomPrefab> myPrefabs;
+	
+	CustomPrefab animy = new CunstomPrefab("Animy");
+	myPrefabs.Add("Animy", animy);
+	myPrefabs.ContainsKey("Animy");
+	myPrefabs.remove("Animy");
+	
+	int index;
+	string currentDisplayText = myPrefabs.Keys.ElementAt (index);
+        CustomPrefab currentValue = myPrefabs.Values.ElementAt (index);
+
+	currentDisplayText = dataSource.Values.First ();
+        currentValue = dataSource.Keys.First ();
+		
+		
+	myPrefabs.Count;
+	myPrefabs.clear();
+	
+	
+	foreach(KeyValuePair<string, CustomPrefab>kvp in myPrefabs)
+	{
+		Console.WriteLine("Key = {0}, Value = {1}",kvp.Key, kvp.Value);
+	}
+	
+	foreach(string key in myPrefabs.Keys)
+	{
+		
+	}

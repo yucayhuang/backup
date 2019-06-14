@@ -1,0 +1,2 @@
+
+发送一条射线：physics.Raycast()，出参为RayCastHit类型变量 hit.collider.gameObject

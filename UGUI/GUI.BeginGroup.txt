@@ -1,0 +1,15 @@
+ 		rectList = new Rect (rect.x, rect.y + rect.height, rect.width, rect.height * dataSource.Count - 1);
+
+                GUI.BeginGroup(rectList);
+
+                float top = 0;
+
+                for (int i = 0; i < dataSource.Count; i++) {
+
+                    drawItem(new Rect (0, top, rect.width, rect.height),i);
+
+                    top += rect.height;
+
+                }
+
+                GUI.EndGroup();

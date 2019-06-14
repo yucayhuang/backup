@@ -1,0 +1,7 @@
+
+	public Animation animationComponent;
+
+	void onDeath(){
+		animationComponent.Play ("Death");
+		Destroy ( gameObject, animationComponent["Death"].length );
+	}

@@ -1,0 +1,55 @@
+今天我们来研究下Unity3d中自定义Editor，这个会让物体的脚本在Inspector视窗中，产生不同的视觉效果。
+
+ 
+
+什么意思，举个例子，比如游戏中我有个角色Player，他有攻击力，护甲，装备等属性。
+
+ 
+
+所以我定义一个脚本：MyPlayer.cs：
+
+
+using UnityEngine;
+using System.Collections;
+ 
+public class MyPlayer : MonoBehaviour
+{
+    public int armor = 100;
+    public int attack = 100;
+    public GameObject equipment;
+    void Start()
+    {
+ 
+    }
+    void Update()
+    {
+ 
+    }
+}
+这边我定义了三个变量，分别是护甲、攻击力还有GameObject类型的装备。
+
+那么，如果我想要修改下护甲，攻击力的显示效果，那么就可以自定义Editor：
+
+
+using UnityEngine;
+using UnityEditor;
+using System.Collections;
+[CustomEditor(typeof(MyPlayer))]
+public class MyPlayerEditor : Editor
+{ 
+    public override void OnInspectorGUI()
+    {
+        var target = (MyPlayer)(serializedObject.targetObject);
+        target.attack = EditorGUILayout.IntSlider("攻击力",target.attack,0,100);
+        ProgressBar(target.attack, "攻击力");
+ 
+        target.equipment =
+        EditorGUILayout.ObjectField("装备",target.equipment,typeof(GameObject));
+    }
+    private void ProgressBar(float value, string label)
+    {
+        Rect rect = GUILayoutUtility.GetRect(18, 18, "TextField");
+        EditorGUI.ProgressBar(rect, value, label);
+        EditorGUILayout.Space();
+    }
+}

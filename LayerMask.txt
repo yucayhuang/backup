@@ -1,0 +1,4 @@
+int layer = LayerMask.NameToLayer(DontDrawLayerNameStr);
+myGameObject.layer = layer;
+
+* cullingMask

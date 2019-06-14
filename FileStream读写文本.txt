@@ -1,0 +1,59 @@
+Unity3d 读写文本txt
+
+先定义一个TXT文档路径： string txtpath = (@"D:\C#练习\1.txt");  要读入这个文档。
+
+(1)File 提供用于创建、复制、删除、移动和打开文件的静态方法，并协助创建 FileStream。
+
+    FileStream fs = File.Open(txtpath, FileMode.Open);
+
+    File可以直接调用各种方法(Open、Delete、Exists等)
+
+    例如： if (File.Exists(txtpath))  File.Delete(txtpath);
+   
+(2)FileInfo 提供用于创建、复制、删除、移动和打开文件的实例方法，并协助创建 FileStream。
+
+    FileInfo fi = new FileInfo(txtpath); //实例化
+
+    FileStream fs = fi.Open();
+
+----------------File,FileInfo,FileStream是用于文件 I/O的类，StreamReader是用于从流读取和写入流的类 -----------------
+
+(3)FileStream 支持通过其 Seek 方法随机访问文件。默认情况下，FileStream 以同步方式打开文
+
+   件，但它也支持异步操作。
+
+   利用FileStream 我们可以得到一个文件的Streams，接着就是来读取。
+
+(4)StreamReader 通过使用 Encoding 进行字符和字节的转换，从 Streams 中读取字符。
+
+    StreamWriter 通过使用 Encoding 将字符转换为字节，向 Streams 写入字符。
+
+    StreamReader sr = new StreamReader(fs);
+
+            string str = null;
+            string temp=null;
+            while((temp=sr.ReadLine())!=null)
+            {
+               str+=" "+temp;
+            }
+			//ReadToEnd
+			 string str=sr.ReadToEnd();//文件从头读到尾
+
+     得到一个字符串，再可以对字符串进行处理。
+
+
+
+
+
+
+
+
+
+
+
+xml文件读写
+
+ XmlDocument xmlDoc = new XmlDocument();  
+            xmlDoc.Load(_xmlPath);  
+            XmlNodeList nodeList = xmlDoc.SelectSingleNode("data/user").ChildNodes;  
+            foreach (XmlElement xe in nodeList)  

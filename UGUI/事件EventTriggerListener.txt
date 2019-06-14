@@ -1,0 +1,218 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.EventSystems;
+public class EventTriggerListener : UnityEngine.EventSystems.EventTrigger{
+	public delegate void VoidDelegate (GameObject go);
+	public VoidDelegate onClick;
+	public VoidDelegate onDown;
+	public VoidDelegate onEnter;
+	public VoidDelegate onExit;
+	public VoidDelegate onUp;
+	public VoidDelegate onSelect;
+	public VoidDelegate onUpdateSelect;
+ 
+	static public EventTriggerListener Get (GameObject go)
+	{
+		EventTriggerListener listener = go.GetComponent<EventTriggerListener>();
+		if (listener == null) listener = go.AddComponent<EventTriggerListener>();
+		return listener;
+	}
+	public override void OnPointerClick(PointerEventData eventData)
+	{
+		if(onClick != null) 	onClick(gameObject);
+	}
+	public override void OnPointerDown (PointerEventData eventData){
+		if(onDown != null) onDown(gameObject);
+	}
+	public override void OnPointerEnter (PointerEventData eventData){
+		if(onEnter != null) onEnter(gameObject);
+	}
+	public override void OnPointerExit (PointerEventData eventData){
+		if(onExit != null) onExit(gameObject);
+	}
+	public override void OnPointerUp (PointerEventData eventData){
+		if(onUp != null) onUp(gameObject);
+	}
+	public override void OnSelect (BaseEventData eventData){
+		if(onSelect != null) onSelect(gameObject);
+	}
+	public override void OnUpdateSelected (BaseEventData eventData){
+		if(onUpdateSelect != null) onUpdateSelect(gameObject);
+	}
+}
+然后在你的界面里面写入监听按钮的代码。
+
+
+
+
+
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
+public class UIMain : MonoBehaviour {
+	Button	button;
+	Image image;
+	void Start () 
+	{
+		button = transform.Find("Button").GetComponent<Button>();
+		image = transform.Find("Image").GetComponent<Image>();
+		EventTriggerListener.Get(button.gameObject).onClick =OnButtonClick;
+		EventTriggerListener.Get(image.gameObject).onClick =OnButtonClick;
+	}
+ 
+	private void OnButtonClick(GameObject go){
+		//在这里监听按钮的点击事件
+		if(go == button.gameObject){
+			Debug.Log ("DoSomeThings");
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EventSystem.current.IsPointerOverGameObject()方法，作用：判断鼠标是否点击在UI上。
+背景UI的话，在Image组件上的有一个Raycast Type的复选框，只要我们把勾选去掉，就行了。
+
+UI和3D场景同时都需要响应触摸事件时，如果同时响应可能就会出现触摸UI的时候影响到了3D部分。
+为了解决这个问题在判断3D响应之前要先判断手指是否点击在UI上。 以前NGUI的时候都是自己来
+发送射线判断，现在UGUI好了系统提供了更为简便的方法。
+
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+#define ANDROID
+#endif
+ 
+ 
+#if UNITY_IPHONE && !UNITY_EDITOR
+#define IPHONE
+#endif
+ 
+ 
+ 
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using UnityEngine.EventSystems;
+public class NewBehaviourScript : MonoBehaviour {
+ 
+	// Use this for initialization
+	void Start () {
+	
+	}
+	
+ 
+	void Update()
+	{
+		if (Input.GetMouseButtonDown(0)||(Input.touchCount >0 && Input.GetTouch(0).phase == TouchPhase.Began))
+		{
+#if IPHONE || ANDROID
+			if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+#else
+			if (EventSystem.current.IsPointerOverGameObject())
+#endif
+				Debug.Log("当前触摸在UI上");
+			
+			else 
+				Debug.Log("当前没有触摸在UI上");
+		}
+	}
+}
+
+在窗口端进行判断时使用：
+
+if（Input.GetMouseButtonDown（0）&&！EventSystem.current.IsPointerOverGameObject（））
+
+在Android的段运行时使用：
+
+if（Input.touchCount> 0 && Input.GetTouch（0）.phase == TouchPhase.Began）//手指按下并且触点大于0 
+     if（！EventSystem.current.IsPointerOverGameObject（Input.GetTouch（0）.fingerId ））//没点到UI 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+一： 下面先说经常用的三个事件  手指按下、手指移动、手指松开
+1.  手指按下
+if(input.touchCount==1)
+{
+   if(input.touches[0].phase==TouchPhase.Beagn)
+   {
+          // 手指按下时，要触发的代码
+   }
+
+2.  手指在屏幕上滑动
+if(input.touchCount==1)
+{  
+     if(input.touches[0].phase==TouchPhase.Move)  
+     {         
+           // 手指滑动时，要触发的代码 
+          float s01=Input.getAxis("Mouse X");    //手指水平移动的距离
+          float s02=Input.getAxis("Mouse Y");    //手指垂直移动的距离
+     }​​​​​​​
+
+3.  手指在屏幕上松开时
+​   if(input.touches[0].phase==TouchPhase.Ended)&&Input.touches[0].phase!=TouchPhase.Canceled  ​​
+
+二： 上面介绍的是单手指触发事件，下面介绍的是多手指触发事件
+if(touchCount==2)   //代表有两个手指
+{
+   if(Input.getTouch(0).phase==TouchPhase.Moved&&    //第一个手指                  Input.getTouch(1).phase==TouchPhase.Moved)            //第二个手指
+    {
+          vecter3 s1=input.getTouch(0).position;         //第一个手指屏幕坐标
+          vecter3 s2=input.getTouch(1).position;         //第二个手指屏幕坐标
+          newdis=Vecter2.distance(s1,s2);
+          if(newdis>olddis)             //手势外拉
+          { 
+                distance+=Time.deltaTime*50f;
+          }
+          if(newdis
+          {
+                distance-=Time.deltaTime*50f;
+          }
+         olddis=newdis;
+    }
+}

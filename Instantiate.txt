@@ -1,0 +1,25 @@
+在Assets文件夹下，新建一个Resources文件夹，把prefab对象放在里面。脚本上用  
+GameObject prefab = Resources.Load("Prebs/prefabName",typeof(GameObject)) as GameObejct;   
+GameObject instance = Instantiate(prefab) as GameObject;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public GameObject uiPrefab;
+public Transform ui;
+
+void Start(){
+	ui = Instantiate(uiPrefab, transform).transform;
+}
+
+Destory(ui.gameObject);

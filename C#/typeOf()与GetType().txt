@@ -1,0 +1,9 @@
+
+C# typeof() 和 GetType()区是什么？
+1、typeof(x)中的x，必须是具体的类名、类型名称等，不可以是变量名称。 
+2、GetType()方法继承自Object，所以C#中任何对象都具有GetType()方法，它的作用和typeof()相同，返回Type类型的当前对象的类型。 
+
+比如有这样一个变量i: 
+Int32 i = new Int32(); 
+
+i.GetType()返回值是Int32的类型，但是无法使用typeof(i)，因为i是一个变量，如果要使用typeof()，则只能：typeof(Int32)，返回的同样是Int32的类型。

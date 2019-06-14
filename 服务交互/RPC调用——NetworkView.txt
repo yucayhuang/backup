@@ -1,0 +1,38 @@
+[RequireComponent (typeof (NetworkView))]
+public class SynchronizeTransform : MonoBehaviour {
+
+	public void AddObject(string prefabName, Vector3 position, Quaternion rotation) {
+		if(Network.isClient) {
+			networkView.RPC("Server_AddTrackedObject", RPCMode.Server, prefabName, position, rotation);
+		}
+		if(Network.isServer) {
+			Server_AddTrackedObject(prefabName, position, rotation);
+		}
+	}
+
+	public void Server_AddTrackedObject(string prefabName, Vector3 position, Quaternion rotation) {
+		if(Network.isServer) {
+			networkView.RPC("AddTrackedObject", RPCMode.All, prefabName, position, rotation, nextTransformID++);
+		}
+	}
+
+
+	//Called on all clients
+	[RPC]
+	void AddTrackedObject(string prefabName, Vector3 position, Quaternion rotation, int ID) {
+		GameObject go = customPrefabs.Instantiate(prefabName, position, rotation) as GameObject;
+		TransformTracker transformTracker = go.AddComponent<TransformTracker>();
+		transformsToTrack.Add(ID, transformTracker);
+	}
+
+
+
+
+
+
+
+
+
+PS:
+//Internally, this is a buffered RPC call.
+GameObject go = Network.Instantiate(Resources.Load("NetworkSphere"), Vector3.zero, Quaternion.identity, 0) as GameObject;

@@ -1,0 +1,17 @@
+假如Winform界面上有个Lable控件，叫做lb_Msg，现在通过UDP服务线程收到了新的数据，想在lb_Msg上显示出来。
+1、声明一个委托
+private delegate void SetMessageDelegate(Label control, string msg);
+2、为此委托实例化一个函数
+private void setLabelText(Label myControl, string myArg)
+{
+myControl.Text = myArg;
+}
+3、调用
+object[] myArray = new object[2];
+myArray[0] = this.lb_Msg;
+myArray[1] = "异步调用成功.";
+this.lb_Msg.BeginInvoke(new SetMessageDelegate(this.setLabelText), myArray);
+
+
+
+invoke为同步， beginInvoke为异步

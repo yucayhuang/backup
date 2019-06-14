@@ -1,0 +1,111 @@
+NetworkManager 单例 (属性：onlineScene, offlineScene)
+
+NetworkBehaviour (PlayerShoot.cs)
+NetworkIdentity  (一个component)
+NetworkTransform (一个component)
+NetworkTransformChild (一个component,用于同步子组件)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Client]	// called only on client
+function void Shoot(){
+	//...
+	CmdPlayerBeenShot(playerid);
+
+}
+
+
+[Command]	// called only on server (host)
+function void CmdPlayerBeenShot(float playerid){
+
+}
+
+
+[SycVar]	// syc value on server and client
+private int currentHealth;
+
+
+[ClientRpc]	// like a syc function, and only effect theOneClientPlayer
+function void RpcTakeDamage(int damage){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// call on server
+[Command]
+void CmdOnReloadBullet(){
+	RpcOnReload();
+}
+
+// call every client
+[ClientRpc]
+void RpcOnReload(){
+
+}
+
+
+
+
+
+
+using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
+//创建
+//...
+networkManager.matchMaker.CreateMatch(roomName, roomSize, true, "", ...
+
+
+
+//匹配
+
+private NetworkManager networkManager;
+
+void Start(){
+	networkManager = NetworkManager .singleton;
+	if(networkManager.matchMaker == null)
+		networkManager.StartMatchMaker();
+	networkManager.matchMaker.ListMatches(0, 20, "", true, 0, 0, OnMatchList);	
+}
+
+public void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matchList){
+	//if(!success || matchList == null)
+	foreach(MatchInfoSnapshot match in matchList){
+		match.name;match.maxSize;match.currentSize;
+	}
+}
+
+//加入
+public void JoinRoom(MatchInfoSnapshot _match){
+	networkManager.matchMaker.JoinMatch(_match.networkId, "", networkManager.onMatchJoined);
+}
+
+//断开
+public void LeaveRoom(){
+	MatchInfo matchInfo = networkManager.matchInfo;
+	networkManager.matchMaker.DropConnection(matchInfo.networkId, matchInfo.nodeId, 0, networkManager.onDropConnection);
+	networkManager.StopHost();
+}

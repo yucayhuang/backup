@@ -1,0 +1,32 @@
+//ÕÊº“ºÒµΩŒ‰∆˜£¨œ≈≈‹À˘”–π÷ ﬁ
+
+public class PickWeaponEvent : MonoBehaviour {
+
+	public delegate void PickWeaponAction ( GameObject weapon );
+	public static event PickWeaponAction OnPickWeapon;
+
+	void OnTriggerEnter( Collider collider ) {
+		if( collider.gameObject.tag == "Weapon" ){
+			if( onPickWeapon != null)
+				onPickWeapon( collider.gameObject );
+		}
+	}
+}
+
+
+public class Enemy : MonoBehaviour {
+	
+	void onEnable () {
+		PickWeaponEvent.OnPickWeapon += PlayerPickWeapon;
+	}
+
+	void onDisable () {
+		PickWeaponEvent.OnPickWeapon -= PlayerPickWeapon;
+	}
+
+	private void PlayerPickWeapon( GameObject weapon ) {
+		if(weapon is veryNB)
+			RunAway();
+	}
+
+	

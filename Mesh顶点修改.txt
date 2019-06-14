@@ -1,0 +1,25 @@
+using UnityEngine;
+     using System.Collections;
+      
+     [RequireComponent(typeof(MeshFilter))]
+     public class example : MonoBehaviour {
+         void Update() {
+             Mesh mesh = GetComponent<MeshFilter>().mesh;
+         Vector3 [] vertices = mesh.vertices;
+             
+         int p = 0;
+         int flag = -1;
+         float maxheight = 0.0F;
+         while (p < vertices.Length) {
+             if(vertices[p].z > maxheight) {
+                 maxheight = vertices[p].z;
+                 flag = p;    
+             }
+             p++;
+        }
+         vertices[flag] += new Vector3(0, 0, maxheight);
+             
+         mesh.vertices = vertices;
+         mesh.RecalculateNormals();
+         }
+     }

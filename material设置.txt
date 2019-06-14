@@ -1,0 +1,8 @@
+  Material[] newBufMat = new Material[trans.transform.GetComponent<Renderer>().materials.Length];
+            for (int i = 0; i < trans.transform.GetComponent<Renderer>().materials.Length; i++)
+            {
+                newBufMat[i] = PenMgr.mInstance.m_alphaMat;
+            }
+
+
+            trans.transform.GetComponent<Renderer>().materials = newBufMat;

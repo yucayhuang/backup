@@ -1,0 +1,19 @@
+定义一个范围，将在此范围之外释放一个或多个对象。
+
+Font font2 = new Font("Arial", 10.0f);
+using (font2)
+{
+    // use font2
+}
+
+
+ using (Font font3 = new Font("Arial", 10.0f), 
+           font4 = new Font("Arial", 10.0f))
+{
+    // Use font3 and font4.
+}
+
+
+
+using 语句允许程序员指定使用资源的对象应当何时释放资源。
+为 using 语句提供的对象必须实现 IDisposable 接口。此接口提供了 Dispose 方法，该方法将释放此对象的资源。

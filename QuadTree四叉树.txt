@@ -1,0 +1,24 @@
+
+public class QuadTree { 
+	static int childCount = 4;
+	static int maxDepth;
+	
+	private var currentDepth = 0;	
+
+	private QuadTree nodeParent;
+	private QuadTree[] childNodes;
+
+this.childNodes = new QuadTree[QuadTree.childCount];
+
+
+
+
+
+
+
+
+
+
+
+
+ps:用于检索，效率更高。find nearby objs quickly and easily;

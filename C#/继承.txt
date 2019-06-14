@@ -1,0 +1,9 @@
+class Car{
+	public Car(int x){}
+	public void f(){}
+}
+
+class TrashCar : Car {
+	public TrashCar(int x):base(x){ ...  }
+	public void f(){ base.f(); ...}
+}

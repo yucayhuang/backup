@@ -1,0 +1,7 @@
+游戏优化，使摄像机没有看到的部分隐藏起来
+
+1.勾选了摄像器的Occlusion Culling属性
+
+2.将能被遮挡的游戏对象在Inspect属性面板上设置为静态（Occluder static一定要勾选）
+
+3.打开Wndow->Occlusion Culling，最后烘焙下

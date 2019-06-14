@@ -1,0 +1,20 @@
+勾选"IsTrigger"属性表示该碰撞体用于触发事件，并将被物理引擎所忽略。意味着，子弹将穿过触碰到的对象，而不会阻碍对象的移动，触碰的时候将会引发"OnTriggerEnter2D"事件。
+
+
+
+void OnTriggerEnter2D(Collider2D otherCollider)
+  {
+    // Is this a shot?
+    ShotScript shot = otherCollider.gameObject.GetComponent<ShotScript>();
+    if (shot != null)
+    {
+      // Avoid friendly fire
+      if (shot.isEnemyShot != isEnemy)
+      {
+        Damage(shot.damage);
+
+        // Destroy the shot
+        Destroy(shot.gameObject); // Remember to always target the game object, otherwise you will just remove the script
+      }
+    }
+  }

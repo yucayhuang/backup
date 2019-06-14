@@ -1,0 +1,10 @@
+	using System.Security.Cryptography;
+
+	MD5 md5 = new MD5CryptoServiceProvider();  
+			byte[] result = md5.ComputeHash(data);  
+			string fileMD5 = "";  
+			foreach (byte b in result)  
+			{  
+				fileMD5 += Convert.ToString(b, 16);  
+			}  
+			return fileMD5;     

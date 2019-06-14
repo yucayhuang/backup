@@ -1,0 +1,247 @@
+C#中的异步和同步
+
+同步
+
+同步（英语：Synchronization [?s??kr?na?'ze??n]），指对在一个系统中所发生的事件（event）之间进行协调，在时间上出现一致性与统一化的现象。说白了就是多个任务一个一个执行，同一时刻只有一个任务在执行。主要应用是互斥资源的访问。下面是实现同步的一个例子：
+
++ View Code
+ 
+
+以上程序编译后，请运行两个实例即两个进程。就可以明显的看出进程间的同步的实现。
+
+线程
+
+线程是进程中某个单一顺序的控制流。也被称为轻量进程（lightweight processes）.计算机科学术语，指运行中的程序的调度单位.
+当一个异步过程调用发出后，调用者不能立刻得到结果。实际处理这个调用的部件在完成后，通过状态、通知和回调来通知调用者。以CAsyncSocket类为例（注意，CSocket从CAsyncSocket派生，但是其功能已经由异步转化为同步），当一个客户端通过调用Connect函数发出一个连接请求后，调用者线程立刻可以朝下运行。当连接真正建立起来以后，socket底层会发送一个消息通知该对象。这里提到执行部件和调用者通过三种途径返回结果：状态、通知和回调。可以使用哪一种依赖于执行部件的实现，除非执行部件提供多种选择，否则不受调用者控制。如果执行部件用状态来通知，那么调用者就需要每隔一定时间检查一次，效率就很低（有些初学多线程编程的人，总喜欢用一个循环去检查某个变量的值，这其实是一种很严重的错误）。如果是使用通知的方式，效率则很高，因为执行部件几乎不需要做额外的操作。至于回调函数，其实和通知没太多区别。
+并行
+
+一般指并行计算，是说同一时刻有多条指令同时被执行，这些指令可能执行于同一CPU的多核上，或者多个CPU上,或者多个物理主机甚至多个网络中.
+异步
+
+与同步相对应，异步指的是让CPU暂时搁置当前请求的响应,处理下一个请求,当通过轮询或其他方式得到回调通知后,开始运行。多线程将异步操作放入另一线程中运行，通过轮询或回调方法得到完成通知,但是完成端口，由操作系统接管异步操作的调度，通过硬件中断，在完成时触发回调方法，此方式不需要占用额外线程。
+异步C#异步与多线程的异同点
+异步和多线程两者都可以达到避免调用线程阻塞的目的，从而提高软件的可响应性。
+异步操作无须额外的线程负担，并且使用回调的方式进行处理，在设计良好的情况下，处理函数可以不必使用共享变量（即使无法完全不用，最起码可以减少 共享变量的数量），减少了死锁的可能。当然异步操作也并非完美无暇。编写异步操作的复杂程度较高，程序主要使用回调方式进行处理，与普通人的思维方式有些 出入，而且难以调试。当需要执行I/O操作时，使用异步操作比使用线程+同步 I/O操作更合适。
+多线程中的处理程序依然是顺序执行，符合普通人的思维习惯，所以编程简单。但是多线程的缺点也同样明显，线程的使用（滥用）会给系统带来上下文切换的额外负担。并且线程间的共享变量可能造成死锁的出现。多线程的适用范围则是那种需要长时间CPU运算的场合，例如耗时较长的图形处理和算法执行。
+control的同步和异步
+（1）Control的Invoke和BeginInvoke与Delegate的Invoke和BeginInvoke是不同的。
+（2）Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
+control的invoke：
+1
+2
+3
+4
+5
+6
+7
+8
+9
+private delegate void InvokeDelegate();
+private void InvokeMethod(){
+//C代码段
+}
+private void butInvoke_Click(object sender, EventArgs e) {
+//A代码段.......
+this.Invoke(new InvokeDelegate(InvokeMethod));
+//B代码段......
+}
+执行顺序为：
+A------>C---------------->B
+解释：
+
+(1)A在UI线程上执行完后，开始Invoke，Invoke是同步
+(2)代码段B并不执行，而是立即在UI线程上执行InvokeMethod方法，即代码段C。
+(3)InvokeMethod方法执行完后，代码段B才在UI线程上继续执行。
+
+control的begininvoke
+
+1
+2
+3
+4
+5
+6
+7
+8
+private delegate void BeginInvokeDelegate();
+private void BeginInvokeMethod(){
+//C代码段
+}
+private void butBeginInvoke_Click(object sender, EventArgs e) {
+//A代码段.......
+this.BeginInvoke(new BeginInvokeDelegate(BeginInvokeMethod));
+//B代码段....}
+执行顺序：
+A----------->B--------------->C
+解释：
+
+(1)A在UI线程上执行完后，开始BeginInvoke，BeginInvoke是异步
+(2)InvokeMethod方法，即代码段C不会执行，而是立即在UI线程上执行代码段B。
+(3)代码段B执行完后(就是说butBeginInvoke_Click方法执行完后)，InvokeMethod方法，即代码段C才在UI线程上继续执行。
+
+ 
+Control的Invoke和BeginInvoke的委托方法是在主线程，即UI线程上执行的。也就是说如果你的委托方法用来取花费时间长的数据，然后更新界面，千万不能调用UI线程上调用Control.Invoke和Control.BeginInvoke，因为这些是依然阻塞UI线程的，造成界面的假死。
+
+那么，这个异步到底是什么意思呢?
+异步是指相对于调用BeginInvoke的线程异步，而不是相对于UI线程异步，你在UI线程上调用BeginInvoke ，当然不行了。（无论如何都在ui进程上执行）
+BeginInvoke的原理是将调用的方法Marshal成消息，然后调用Win32 API中的RegisterWindowMessage()向UI窗口发送消息。
+我们用Thread来调用BeginInvoke和Invoke
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+private Thread invokeThread;
+private delegate void invokeDelegate();
+private void StartMethod(){
+//C代码段......
+Control.Invoke(new invokeDelegate(invokeMethod));
+//D代码段......
+}
+private void invokeMethod(){
+//E代码段
+}
+private void butInvoke_Click(object sender, EventArgs e) {
+//A代码段.......
+invokeThread = new Thread(new ThreadStart(StartMethod));
+invokeThread.Start();
+//B代码段......
+}
+A------>(Start一开始B和StartMethod的C就同时执行)---->(C执行完了，不管B有没有执行完，invokeThread把消息封送(invoke)给UI线程，然后自己等待)---->UI线程处理完butInvoke_Click消息后，处理invokeThread封送过来的消息，执行invokeMethod方法，即代码段E，处理往后UI线程切换到invokeThread线程。
+
+解释：
+1。UI执行A
+2。UI开线程InvokeThread，B和C同时执行，B执行在线程UI上，C执行在线程invokeThread上。
+3。invokeThread封送消息给UI，然后自己等待，UI处理完消息后，处理invokeThread封送的消息，即代码段E
+4。UI执行完E后，转到线程invokeThread上，invokeThread线程执行代码段D
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+private Thread beginInvokeThread;
+private delegate void beginInvokeDelegate();
+private void StartMethod(){
+//C代码段......
+Control.BeginInvoke(new beginInvokeDelegate(beginInvokeMethod));
+//D代码段......
+}
+private void beginInvokeMethod(){
+//E代码段
+}
+private void butBeginInvoke_Click(object sender, EventArgs e) {
+//A代码段.......
+beginInvokeThread = new Thread(new ThreadStart(StartMethod));
+beginInvokeThread .Start();
+//B代码段......
+}
+ A在UI线程上执行----->beginInvokeThread线程开始执行，UI继续执行代码段B，并发地invokeThread执行代码段C-------------->不管UI有没有执行完代码段B，这时beginInvokeThread线程把消息封送给UI，单自己并不等待，继续向下执行-------->UI处理完butBeginInvoke_Click消息后，处理beginInvokeThread线程封送过来的消息。
+
+解释：
+1。UI执行A
+2。UI开线程beginInvokeThread，B和C同时执行，B执行在线程UI上，C执行在线程beginInvokeThread上。
+3。beginInvokeThread封送消息给UI，然后自己继续执行代码D，UI处理完消息后，处理invokeThread封送的消息，即代码段E
+有点疑问：如果UI先执行完毕，是不是有可能过了段时间beginInvokeThread才把消息封送给UI，然后UI才继续执行封送的消息E。如图浅绿的部分。
+
+Control的BeginInvoke是相对于调用它的线程，即beginInvokeThread相对是异步的。
+因此，我们可以想到。如果要异步取耗费长时间的数据，比如从数据库中读大量数据，我们应该这么做。
+(1)如果你想阻止调用线程，那么调用代码(三)，代码段D删掉，C改为耗费长时间的操作，因为这个操作是在另外一个线程中做的。代码段E改为更新界面的方法。
+(2)如果你不想阻止调用线程，那么调用代码(四)，代码段D删掉，C改为耗费长时间的操作，因为这个操作是在另外一个线程中做的。代码段E改为更新界面的方法。
+ 
+委托还能写成下面的两种形式
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+public delegate void NoparamDelegate(Tools toolPanel);
+public void hideTool()
+{
+    NoparamDelegate hide = delegate (Tools toolPanel)
+    {
+       toolPanel.Visibility = Visibility.Hidden;
+       btnTool.Switch = false;
+    };
+    hide.Invoke(toolPanel);
+    }
+ 
+public void hideTool()
+{
+      Dispatcher.Invoke(()=> {
+      toolPanel.Visibility = Visibility.Hidden;
+      btnTool.Switch = false;
+    });
+    }
+ 
+
+在实际操作用，如果用Thread操作界面相关的代码，会出现错误：    调用线程必须为 STA,因为许多 UI 组件都需要，
+
+那么我们该如何处理呢？
+
+1、委托实现
+
+public delegate void NoParamDelegate();
+
+//要实现的方法
+
+public void Func()
+ {
+
+          //使用ui元素    
+
+ }
+
+线程函数中做如此调用：  System.Windows.Application.Current.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal,new NoParamDelegate(Func)); 
+
+ 
+
+2、指定线程为STA
+
+Thread NetServer = new Thread(new ThreadStart(NetServerThreadFunc));
+ NetServer .SetApartmentState(ApartmentState.STA);
+ NetServer .IsBackground = true;
+
+ NetServer.Start();
+
+ 线程函数中做如此调用：
+
+ System.Windows.Threading.Dispatcher.Run();
+
+ 

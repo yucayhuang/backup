@@ -1,0 +1,27 @@
+
+	public bool AddItem(string itemName, InventoryItem.InventoryItemType type) {
+		if(items.Count < maxInventory) {
+			InventoryItem item = new InventoryItem(nextItemID++, itemName, type);
+			items.Add(item);
+			OnItemAdded(item);
+			return true;
+		}
+		return false;
+	}
+	
+	public void AddItemFromRemote(InventoryItem item) {
+		nextItemID = Mathf.Max(item.ID + 1, nextItemID);
+		items.Add(item);
+	}
+
+	//When we add an item to the inventory, send it to all the other clients
+	public void OnIventoryItemAdded(InventoryItem item) {
+		networkView.RPC("RPC_AddItem", RPCMode.Others, NetworkUtils.SerializeObject(item));
+	}
+
+	//Get an item from a remote client to add
+	[RPC]
+	void RPC_AddItem(byte[] inventoryItem) {
+		InventoryItem item = (InventoryItem) NetworkUtils.DeserializeObject(inventoryItem);
+		AddItemFromRemote(item);
+	}

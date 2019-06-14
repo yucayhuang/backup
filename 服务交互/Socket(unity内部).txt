@@ -1,0 +1,88 @@
+利用socket简单的实现，客户端和服务器之间的通信。
+
+
+
+
+
+
+
+客户端：
+
+using UnityEngine;
+using System.Collections;
+using System.Text;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
+
+
+public class client : MonoBehaviour {
+void Start () {
+        ConncetServer();
+}
+
+
+    void ConncetServer()
+    {
+        IPAddress ipAdr = IPAddress.Parse("10.130.28.9");
+        IPEndPoint ipEp=new IPEndPoint(ipAdr,7000);
+        Socket clientScoket=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+        clientScoket.Connect(ipEp);
+        string output="client requeset";
+        byte[] concent=Encoding.UTF8.GetBytes(output);
+        clientScoket.Send(concent);
+        byte[] response=new byte[1024];
+        int bytesRead = clientScoket.Receive(response);
+        string input = Encoding.UTF8.GetString(response,0,bytesRead);
+        print("Client request:"+input);
+        clientScoket.Shutdown(SocketShutdown.Both);
+        clientScoket.Close();
+    }
+}
+
+
+
+服务器：
+
+using UnityEngine;
+using System.Collections;
+using System.Collections;
+using System.Net;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
+
+
+public class Connet : MonoBehaviour {
+
+
+// Use this for initialization
+void Start () {
+        OpenServer();
+}
+    void OpenServer()
+    {
+        IPAddress ipAdr = IPAddress.Parse("10.130.28.9");
+        IPEndPoint ipEp = new IPEndPoint(ipAdr,7000);
+        //creat a socket
+        Socket serverScoket = new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+        //bind the socket
+        serverScoket.Bind(ipEp);
+        //listen
+        serverScoket.Listen(20);
+        while(true)
+        {
+            Socket client = serverScoket.Accept();
+            byte[] request=new byte[512];
+            //receive
+            int bytesRead = client.Receive(request);
+            string input = Encoding.UTF8.GetString(request,0,bytesRead);//按照字符编码得到字符串
+            print("server request:"+input);
+            string output = "server request true";
+            byte[] concent = Encoding.UTF8.GetBytes(output);
+            client.Send(concent);
+            client.Shutdown(SocketShutdown.Both);//关闭接收和发送
+            client.Close();
+        }
+    }
+}

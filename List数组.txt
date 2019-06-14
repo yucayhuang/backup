@@ -1,0 +1,13 @@
+ 	scaleDatas = new List<ScaleData>();
+        foreach( ParticleSystem p in transform.GetComponentsInChildren<ParticleSystem>(true)){
+            scaleDatas.Add(new ScaleData(){transform = p.transform,beginScale = p.transform.localScale});
+        }
+
+
+
+
+ class ScaleData
+    {
+        public Transform transform;
+        public Vector3 beginScale = Vector3.one;
+    }

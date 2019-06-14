@@ -1,0 +1,134 @@
+EventInterface
+
+声明了一系列的 Event 事件
+IEventSystemHandler
+IPointerEnterHandler : IEventSystemHandler
+IPointerExitHandler: IEventSystemHandler
+IPointerDownHandler: IEventSystemHandler
+IPointerUpHandler: IEventSystemHandler
+IPointerClickHandler: IEventSystemHandler
+IBeginDragHandler: IEventSystemHandler
+IInitializePotentialDragHandler: IEventSystemHandler
+IDragHandler: IEventSystemHandler
+IEndDragHandler: IEventSystemHandler
+IScrollHandler: IEventSystemHandler
+IUpdateSelectedHandler: IEventSystemHandler
+ISelectHandler: IEventSystemHandler
+IDeselectHandler: IEventSystemHandler
+IMoveHandler: IEventSystemHandler
+ISubmitHandler: IEventSystemHandler
+ICancelHandler: IEventSystemHandler
+
+以上这些接口都会在 ExecuteEvents 里被调用。 
+ExecuteEvents 类是个 静态类，不能被实例化，
+所有的公共方法都通过 ExecuteEvents.XXXX 来调用。
+ExecuteEvents 里声明了一个 delegate 的类型EventFunction，
+这是一个泛型委托，委托的第一个参数 handler 可以是不同的类型。
+
+public delegate void EventFunction<T1>(T1 handler, BaseEventData eventData);
+
+然后对 EventInterface 里除了 IEventSystemHandler 外
+每一个接口声明了一个 EventFunction 类型的委托变量和方法。 
+形如：
+private static void Execute(IPointerEnterHandler handler, BaseEventData eventData) 
+{ 
+	handler.OnPointerEnter(ValidateEventData<PointerEventData>(eventData)); 
+}
+
+ExecuteEvents
+
+外部统一通过 Execute 方法执行事件, 本质 其实就是 指定某个接口类型，
+由Execute方法调用目标对象的接口方法 。
+
+public static bool Execute<T>(GameObject target, BaseEventData eventData, EventFunction<T> functor) where T : IEventSystemHandler 
+{ 
+	var internalHandlers = s_HandlerListPool.Get(); 
+	GetEventList<T>(target, internalHandlers); 
+	// if (s_InternalHandlers.Count > 0) 
+	// Debug.Log("Executinng " + typeof (T) + " on " + target); 
+	for (var i = 0; i < internalHandlers.Count; i++) 
+	{ 
+		T arg; 
+		try{ 
+			arg = (T)internalHandlers[i]; 
+		} 
+		catch (Exception e) 
+		{ 
+			var temp = internalHandlers[i]; 
+			Debug.LogException(new Exception(string.Format("Type {0} expected {1} received.", typeof(T).Name, temp.GetType().Name), e)); 
+			continue; 
+		} 
+		try{ 
+			functor(arg, eventData); 
+		} 
+		catch (Exception e) 
+		{ 
+			Debug.LogException(e); 
+		} 
+	} 
+	var handlerCount = internalHandlers.Count; 
+	s_HandlerListPool.Release(internalHandlers); 
+	return handlerCount > 0; 
+}
+
+举例说明
+
+在BaseInputModule里
+protected void HandlePointerExitAndEnter(PointerEventData currentPointerData, GameObject newEnterTarget) 
+{ 
+	// if we have no target / pointerEnter has been deleted 
+	// just send exit events to anything we are tracking 
+	// then exit 
+	if (newEnterTarget == null || currentPointerData.pointerEnter == null) 
+	{ 
+		for (var i = 0; i < currentPointerData.hovered.Count; ++i) 
+			ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerExitHandler); 
+		currentPointerData.hovered.Clear(); 
+		if (newEnterTarget == null) 
+		{ 
+			currentPointerData.pointerEnter = newEnterTarget; 
+			return; 
+		} 
+	} 
+	// if we have not changed hover target 
+	if (currentPointerData.pointerEnter == newEnterTarget && newEnterTarget) 
+		return; 
+	GameObject commonRoot = FindCommonRoot(currentPointerData.pointerEnter, newEnterTarget); 
+	// and we already an entered object from last time 
+	if (currentPointerData.pointerEnter != null) 
+	{ 
+		// send exit handler call to all elements in the chain 
+		// until we reach the new target, or null! 
+		Transform t = currentPointerData.pointerEnter.transform; 
+		while (t != null) 
+		{ 
+			// if we reach the common root break out! 
+			if (commonRoot != null && commonRoot.transform == t) 
+				break; 
+			ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerExitHandler); 
+			currentPointerData.hovered.Remove(t.gameObject); 
+			t = t.parent; 
+		} 
+	} 
+	// now issue the enter call up to but not including the common root 
+	currentPointerData.pointerEnter = newEnterTarget; 
+	if (newEnterTarget != null) 
+	{ 
+		Transform t = newEnterTarget.transform; 
+		while (t != null && t.gameObject != commonRoot) 
+		{ 
+			ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerEnterHandler); 
+			currentPointerData.hovered.Add(t.gameObject); 
+			t = t.parent; 
+		} 
+	} 
+}
+中的 ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerEnterHandler);
+
+
+
+其他方法
+
+GetEventChain – 获取target的所有父对象(包含自己)
+ExecuteHierarchy – 通过 GetEventChain 获取 target 列表后执行 Execute 方法。
+GetEventHandler – 遍历目标对象及其父对象，判断他们是否包含某个指定接口，如果包含则作为返回值返回。而判断方法是 CanHandleEvent ，通过 GetEventList 方法获取 target 上的 T 类型的组件列表，判断列表数量不为零。 GetEventHandler 主要在输入模块里被调用，用于获取某个输入事件的响应对象。

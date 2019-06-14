@@ -1,0 +1,21 @@
+
+	delegate void D1();
+	delegate void D2();
+	event D1 E1;
+	void onWindowCreated(int winID){
+
+		Debug.Log ("----------------- delegate -------------------");
+		D1 d1 = new D1 (doA);
+		d1 += new D1 (doB);
+		//d1 ();
+
+		D1 d2 = new D1 (doC);
+		d2 += new D1 (doD);
+		//d2 ();
+
+		Debug.Log ("------------------- event -------------------");
+		E1 += d1;
+		E1 += d2;
+		E1 ();
+
+	}

@@ -1,0 +1,6 @@
+int[] intArray = {1,2,3};
+
+
+
+ List<student> students = new List<student>();
+            students.Add(new student { Name = "zhu", classNum = "1", id = "1" });

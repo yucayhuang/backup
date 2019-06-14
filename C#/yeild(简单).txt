@@ -1,0 +1,72 @@
+private vartextS : String;  
+private varcounter : float = 0;  
+ functionUpdate ()   {  
+	//call the function that waits three seconds to execute       
+	WaitThreeSeconds();   
+}    
+
+//This function waits three seconds before executing  
+ functionWaitThreeSeconds()  {  
+	//Waits three seconds   
+	yield WaitForSeconds(3); 
+	//converts the counter to a String and stores its value in textS  
+	textS = "Three seconds has passed, now I'm counting..."+counter.ToString();  //add one to the counter
+	++counter;   
+}     
+function OnGUI()  {  
+	//The next line displays the first line of text  
+	GUI.Label(new Rect(20,20,250,20), "I will start counting in 3 seconds.");  //Displays the counter  
+	GUI.Label(new Rect(20,40,500,20),textS);  
+}   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using UnityEngine; 
+using System.Collections;  
+public class Yield : MonoBehaviour  {  
+private string textS; 
+private float counter = 0;   
+void Update () {  
+	//doesn't generate an error but doesn't work either.  
+	WaitThreeSeconds();//<=does nothing  
+	//start the coroutine named WaitThreeSeconds  
+ 	StartCoroutine("WaitThreeSeconds");//<=right     
+}  
+//Waits three seconds before executing       
+IEnumerator WaitThreeSeconds() {  
+	//Waits three seconds  
+	yield return newWaitForSeconds(3); 
+	//converts the counter to a String and stores its value in textS 
+	textS = "Three seconds has passed, now I'm counting..." + counter.ToString();  //add one to the counter         ++counter;       
+}         
+void OnGUI() {  
+	//The next line displays the first line of text  
+	GUI.Label(newRect(20,20,250,20), "I will start counting in 3 seconds.");  //Displays the counter  
+	GUI.Label(new Rect(20,40,500,20),textS);      
+}   
+}     
+
+
+
+
+
+
+
+
+
+
+
+
+

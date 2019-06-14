@@ -1,0 +1,16 @@
+Unity3d Dictionary简单用法
+
+Dictionary<string,Vector3> temp =new Dictionary<string,Vector3>();//
+temp.Add ("0", new Vector3 (0, 0, 0));
+temp.Add ("1", new Vector3 (0, 1, 0));//给字典添加数据
+Debug.Log (temp.Keys.Count);//读取当前字典长度
+Vector3 testGet;
+temp.TryGetValue ("0", out testGet);//从字典里读取数据
+
+Vector3 testGet=temp["1"];//也可以这样获取数据
+
+Debug.Log (testGet);
+
+最后包含字典的包
+
+using System.Collections.Generic;

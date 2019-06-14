@@ -1,0 +1,16 @@
+void OnGUI()
+    {
+        if (GUILayout.Button("Load Bundle All"))
+        {
+            StartCoroutine(loadBundleAll(PathURL + "All.assetbundle"));
+        }
+    }
+
+private IEnumerator loadBundleAll(string path)
+    {
+        WWW bundle = new WWW(path);
+        yield return bundle;
+        Instantiate(bundle.assetBundle.Load("MyCubePreb"));
+        Instantiate(bundle.assetBundle.Load("MySpherePreb"));
+        yield return 1;
+    }

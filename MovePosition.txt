@@ -1,0 +1,14 @@
+class PlayerController:MonoBehaviour{
+	int speed;
+
+	void Update(){
+		float h = Input.getAxis("Horizonetal");
+		float v = Input.getAxis("Vertical");
+	
+		rigidbody.MovePosition(transform.position + new Vector3(h,0,v)*speed*Time.deltaTime);
+
+
+
+ps:
+先给player添加刚体
+使用刚体移动，会检测碰撞

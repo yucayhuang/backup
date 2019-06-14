@@ -1,0 +1,35 @@
+1.调用Awake()
+物体被加载到场景的时候调用该函数，在Start函数执行前以及预制物体实例化后被执行。一些初始化的操作可以写在这。
+
+2.调用Start()
+该函数在游戏开始时，Update或FixedUpdate函数之前调用一次。
+
+3．while ()循环
+1）.所有FixedUpdate()函数
+2）.物理模拟,物理引擎处理计算。
+3）.触发器OnEnter/Exit/Stay函数由物理引擎判断和触发
+碰撞体OnEnter/Exit/Stay函数由物理引擎判断和触发
+4）.刚体插值应用于transform.position 和 rotation
+5）.OnMouseDown/OnMouseUp等输入事件处理
+6）.调用Update()函数
+7）.高级动画、混合并影响物体transform属性
+8）.调用所有LateUpdate()函数
+9）.Rendering() 渲染
+
+Tips：
+1.Awake和Start 然而在单个GameObject中多个Component以及多个GameObject中的脚本执行顺序上定义不清。简单的说，他们的执行顺序是不固定的，这使得我们在设计游戏的时候产生了不少麻烦。
+
+有些时候我们需要对初始化顺序做一些明确的要求，如我们希望一些Manager比其他的脚本的Awake更早被执行。在这种情况下，如果我们将初始化操作 写在这些Manager的Awake中，就有可能出现某些Manager在其他脚本的Awake调用之后才被调用到。这里我们推荐的做法是做一个主控制 MonoBehavior如 Main, 然后在它的Awake函数中去调用其他Manager的Init 函数。
+
+2.Unity3D虽然提供了 Update 和 LateUpdate 函数，但是我们同样可以利用总控的方式来安排自己的Update顺序。FixedUpdate的时间间隔可以在菜单设置中更改，Edit->Project Setting->time  找到Fixed timestep修改即可。
+
+FixedUpdate()比Update()函数调用的更频繁。当帧率比较低时，它每帧被调用多次，如果帧率比较高，它有可能就不会被调用。所有的物理计算和更新都立即发生在FixedUpdate()之后。当在FixedUpdate()中计算物体移动时，你不需要乘以Time.deltaTime。因为FixedUpdate()是基于可靠的定时器的，不受帧率的影响。
+
+LateUpdate: 在Update()执行后，LateUpdate() 也是每帧都被调用。在Update()中执行的任何计算都会在LateUpdate()开始之前完成。LateUpdate()的一个常见应用就是第三人称控制器的相机跟随。如果你把角色的移动和旋转放在Update()中，那么你就可以把所有相机的移动旋转放在LateUpdate()。这是为了在相机追踪角色位置之前，确保角色已经完成移动。
+
+3.在任何函数之外的代码在物体被加载的事后运行。可以用来初始化脚本状态。
+
+4.规范：
+1）.变量名首字母小写。
+2）.函数 首字母大写。
+3）.类 首字母大写。

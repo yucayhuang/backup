@@ -1,0 +1,87 @@
+﻿unity3D与网页的交互---做项目的一点总结
+由于项目需要，要求用unity来展示三维场景，并在三维中能够方便的查询数据库等。一开始尝试在unity中直接连接数据库，当时连的xml，然而每次发布成网页后都会出现路径找不到等问题，所以迫不得已采用了unity向网页传送数据，网页中处理数据（查询数据库），然后将处理过的数据再反传送给unity，最终在unity中将其展示(在网页中展示更为灵活)。
+        原理很简单：
+
+1、unity向网页发送数据的函数：Application.ExternalCall("SayHello",gameObject.name)，这个函数将调用网页中的SayHello函数，gameObject.name为传递的参数。
+
+2、网页向unity发送数据的函数：网页中用GetUnity().SendMessage(message, "AcceptName", buildingname)函数来调用unity中的函数，此函数的参数message为unity中的物体，AcceptName为物体上的函数，buildingname为传递的参数。
+
+网页中的函数如下：
+
+ 1 function SayHello(message){//此函数来接收unity中发送出来的message值，并将处理后的数据再发送回unity中
+ 2       jQuery.post('../Unity/javascript/DBhelper.ashx', {id:message}, function(data)
+ 3         {
+ 4             var msg=JSON.parse(data);//将json数据解析
+ 5              var buildingname = msg[0].Building_name;
+ 6             var buildingcategory=msg[0].Building_category;
+ 7             var buildingpic = msg[0].Building_pic;
+ 8           GetUnity().SendMessage(message, "AcceptName", buildingname);//向unity中的message物体上的MyFunction函数发送buildingname值
+ 9            GetUnity().SendMessage(message, "AcceptCategory", buildingcategory);
+10 
+11            GetUnity().SendMessage(message, "AcceptImg", buildingpic);
+12         });    
+13 } 
+
+ 此函数将unity中发送的数据message传到DBhelper.ashx中，在DBhelper.ashx中将传递过来的数据进行查询等操作，然后再用GetUnity().SendMessage(message, "AcceptName", buildingname)将处理好的数据buildingname传给unity中的AcceptName函数。
+
+以下是unity中的脚本，可以实现中文，关于中文的实现由于文章有限，在此不再说明，只说明怎样接收网页中的数据。
+
+
+ 1 var chineseSkin : GUISkin;//在此可以选择字体，并设置为中文。建议编辑器设为uft-8。
+ 2 
+ 3 var buildingname:String;//用来接收从网页中传递过来的buildingname值
+ 4 var buildingcategory:String;//用来接收从网页中传递过来的buildingcategory值
+ 5 
+ 6 var buildingpic:Texture2D;//用来接收从网页中传递过来的buildingpic值
+ 7 var windowRect0 = Rect (20, 20, 250, 200);
+ 8 var enable:boolean;
+ 9 function Awake(){
+10 	enable = false ;
+11 }
+12 function OnMouseDown () {
+13 	Application.ExternalCall("SayHello",gameObject.name);// 向网页中的SayHello函数发送gameObject.name数据
+14 	enable = true;
+15 }
+16 function AcceptName(bdname){//用于接收网页中发送回来的数据
+17 	buildingname = bdname;
+18 }
+19 function AcceptCategory(buildingType){//用于接收网页中发送回来的数据
+20 	buildingcategory = buildingType;
+21 }
+22 
+23 function AcceptImg(img){
+24 	var www :WWW = new WWW("http://localhost:1166/Unity/images/"+img+"");
+25 	yield www;
+26 	buildingpic = www.texture;
+27 }
+28 function OnGUI(){
+29 	GUI.skin=chineseSkin;
+30 	if(enable)
+32 		windowRect0 = GUI.Window (0, windowRect0, DoMyWindow, "属性");
+33 }
+34 
+35 function DoMyWindow (windowID : int) {
+36 	GUI.Label(Rect(10,50,80,30),"建筑物名字");
+37 	GUI.TextField(Rect(100,50,100,30),buildingname);
+38 	GUI.Label(Rect(10,100,80,30),"建筑物类型");
+39 	GUI.TextField(Rect(100,100,100,30),buildingcategory);
+40 
+41 	GUI.DrawTexture(Rect(10,150,200,50),buildingpic,ScaleMode.ScaleToFit,true,0);
+42 	if(GUI.Button(Rect(190,20,50,30),"退出")){
+43 		enable = false;
+44 	}
+45 	GUI.DragWindow (Rect (0,0,10000,10000));
+46 }
+47 function OnMouseOver(){
+48     transform.Rotate(0,Time.deltaTime*100,0,Space.World);
+49 }
+50 function OnMouseEnter(){
+51     renderer.material.color = Color.blue;
+52 }
+53 function OnMouseExit(){
+54     renderer.material.color = Color.yellow;    
+55 }
+
+这是unity中的脚本，此脚本实现点击物体，弹出物体的属性。
+
+至此实现了网页与unity的交互，在此过程中感谢我的同事老赵给了我莫大的帮助，教会了我很多程序员应具有的素质，老赵是个好人。

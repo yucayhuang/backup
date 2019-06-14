@@ -1,0 +1,23 @@
+
+	void onEnable(){
+		Application.RegisterLogCallback(WriteLogger);
+	}
+
+	void onDisable(){
+		Application.RegisterLogCallback(null);
+	}
+
+	void WriteLogger(string logStr, string stackTrace, LogType type){
+		switch(type){
+			case LogType.Error:
+			case LogType.Exception:
+				StreamWriter writer = new StreamWriter(new FileSteam(saveFile, FileMode.Append));
+				using(writer)
+				{
+					writer.WriteLine(type);
+					writer.WriteLine(logStr);
+					writer.WriteLine(stackTrace);
+				}
+				break;
+		}
+	}

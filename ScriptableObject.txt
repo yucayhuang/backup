@@ -1,0 +1,89 @@
+Static Methods
+
+CreateInstance	Creates an instance of a scriptable object.
+
+
+
+Messages
+
+Awake	This function is called when the ScriptableObject script is started.
+OnDestroy	This function is called when the scriptable object will be destroyed.
+OnDisable	This function is called when the scriptable object goes out of scope.
+OnEnable	This function is called when the object is loaded.
+
+
+
+
+Static Methods
+
+Destroy	Removes a gameobject, component or asset.
+DestroyImmediate	Destroys the object obj immediately. You are strongly recommended to use Destroy instead.
+DontDestroyOnLoad	Makes the object target not be destroyed automatically when loading a new scene.
+FindObjectOfType	Returns the first active loaded object of Type type.
+FindObjectsOfType	Returns a list of all active loaded objects of Type type.
+Instantiate	Clones the object original and returns the clone.
+
+
+
+
+
+
+
+
+PS:
+//由于右键创建配置文件
+[CreateAssetMenu()]
+public class GlobleData :ScriptableObject {
+
+
+
+
+
+
+
+例子：
+
+using UnityEngine;
+using System.Collections;
+ 
+//由于右键创建配置文件
+[CreateAssetMenu()]
+public class GlobleData :ScriptableObject {
+ 
+    public bool globle1=false;
+    public int globle2 = 1;
+    public GlobleType globleType;
+ 
+}
+ 
+public enum GlobleType{
+	type1,
+	type2,
+	type3
+}
+
+
+
+然后，在代码文件上点击右键/create/globle（类名），生成了一个带有unitylogo的文件
+选中这文件看到Inspecter显示了我们刚才定义的参数我们可以自由设置,接下来要做的是读取这些值，
+我们直接把这个配置文件放到Resources下面然后利用 Resources.Load<GlobleData> ("Globle Data");获得配置文件。
+
+
+
+using UnityEngine;
+using System.Collections;
+ 
+public class ReadTest : MonoBehaviour {
+ 
+    // Use this for initialization
+    void Start () {
+     
+        GlobleData globleData = Resources.Load<GlobleData> ("Globle Data");
+        Debug.Log (globleData.globle1);
+        Debug.Log (globleData.globle2);
+        Debug.Log (globleData.globleType);
+ 
+    }
+     
+ 
+}

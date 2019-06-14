@@ -1,0 +1,22 @@
+using System;
+using System.Collections;
+
+	Queue myQ = new Queue();
+	myQ.Enqueue( "Hello" );
+	myQ.Enqueue( "World" );
+
+	Console.Write( "Queue values:" );
+	PrintValues( myQ );					// Hello World
+
+	Console.WriteLine( "(Dequeue)\t{0}", myQ.Dequeue() );	// Hello
+
+	Console.Write( "Queue values:" );
+	PrintValues( myQ );					// World
+
+
+
+	public static void PrintValues( IEnumerable myCollection )  {
+      		foreach ( Object obj in myCollection )
+        		Console.Write( "    {0}", obj );
+		Console.WriteLine();
+   	}	

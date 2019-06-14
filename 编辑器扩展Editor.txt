@@ -1,0 +1,172 @@
+1 . ScriptableObject  
+
+右键菜单
+
+
+
+
+2. public class TransformUtilitiesWindow : EditorWindow 
+
+一个类似于inspector、hierarchy的窗口
+
+
+
+
+3. [CustomEditor(typeof(Star))]
+public class StarInspector : Editor {
+
+inspector 内的一些功能
+
+
+
+
+
+
+
+
+
+3.
+?using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using System.Reflection;
+
+
+[CustomEditor(typeof(AdvComponent), true)]
+public class CustomPrefabEditor : Editor {
+
+	List<SerializedProperty> requiredProperties;
+	List<SerializedProperty> optionalProperties;
+	AdvComponent advancedComponent;
+
+	string generatedScript = "";
+
+	void OnEnable() {
+		advancedComponent = serializedObject.targetObject as AdvComponent;
+		requiredProperties = new List<SerializedProperty>();
+		optionalProperties = new List<SerializedProperty>();
+
+		foreach(FieldInfo fieldInfo in target.GetType().GetFields(BindingFlags.Public |
+	                                                        	  BindingFlags.Instance |
+	                                                        	  BindingFlags.DeclaredOnly)) {
+			if(AdvComponent.RequiresDefinition(fieldInfo)) {
+				SerializedProperty requiredProperty = serializedObject.FindProperty(fieldInfo.Name);
+				if(requiredProperty != null) {
+					requiredProperties.Add(requiredProperty);
+				}
+			} else {
+				SerializedProperty optionalProperty = serializedObject.FindProperty(fieldInfo.Name);
+				if(optionalProperty != null) {
+					optionalProperties.Add(optionalProperty);
+				}
+			}
+		}
+	}
+	
+	public override void OnInspectorGUI() {
+		//Always update the object
+		serializedObject.Update();
+
+		EditorGUILayout.LabelField("Required fields (" + requiredProperties.Count + ")");
+		EditorGUI.indentLevel++;
+		foreach(SerializedProperty required in requiredProperties) {
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(required);
+			EditorGUILayout.EndHorizontal();
+		}
+		EditorGUI.indentLevel--;
+
+		EditorGUILayout.LabelField("Optional fields (" + optionalProperties.Count + ")");
+		EditorGUI.indentLevel++;
+		foreach(SerializedProperty optional in optionalProperties) {
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(optional);
+			EditorGUILayout.EndHorizontal();
+		}
+		EditorGUI.indentLevel--;
+
+		if(GUILayout.Button("Generate script")) {
+			generatedScript = advancedComponent.GenerateComponentScript();
+		}
+		if(generatedScript.Length > 0) {
+			EditorGUILayout.TextArea(generatedScript);
+		}
+
+		//And always apply changes. This will update the serialized properties of the serialized object
+		serializedObject.ApplyModifiedProperties();
+	}
+}
+
+
+
+
+
+
+
+
+2.
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using System.Reflection;
+
+public class PrefabManagerEditor : EditorWindow {
+
+	static string scriptToParse = "";
+	bool validScript = false;
+	bool error = false;
+	AdvCustomPrefab myPrefab;
+	
+	//[MenuItem ("GameObject/Prefab Manager")]
+	static void Init () {
+		//GetWindow will either retrieve an existing window, or create a new one if one doesn't exist.
+		PrefabManagerEditor newManager = (PrefabManagerEditor)EditorWindow.GetWindow (typeof (PrefabManagerEditor));
+	}
+
+
+	public void OnGUI () {
+
+		bool wrap = EditorStyles.textField.wordWrap;
+		EditorStyles.textField.wordWrap = true;
+		//Create a text area that fills the window
+		string updatedScript = EditorGUILayout.TextArea(scriptToParse, GUILayout.ExpandHeight (true));
+		EditorStyles.textField.wordWrap = wrap;
+
+
+		if(!updatedScript.Equals(scriptToParse)) {
+			//invalidate our prefab and script when the script changes
+			validScript = false;
+			error = false;
+		}
+		scriptToParse = updatedScript;
+
+
+		if(GUILayout.Button("Parse script")) {
+			//Pass in the contents of the textarea as the script for this prefab
+			myPrefab = new AdvCustomPrefab("TestPrefab", scriptToParse);
+			if(myPrefab.PrepAndVerify()) {
+				validScript = true;
+				error = false;
+			} else {
+				validScript = false;
+				error = true;
+			}
+		}
+		
+		//If it's valid, let the user know in the window, and give them the option to instantiate a copy.
+		if(validScript) {
+			EditorGUILayout.HelpBox("Parse complete. No errors, check console for any warnings.", MessageType.Info, true);
+			if(GUILayout.Button("Instantiate")) {
+				myPrefab.Instantiate();
+			}
+		}
+
+		//If there's an error, the user know.
+		if(error) {
+			EditorGUILayout.HelpBox("Error parsing! See console for errors.", MessageType.Error, true);
+		}
+	}
+	
+}

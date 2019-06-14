@@ -1,0 +1,64 @@
+//这个接口告知调方对象的子项可以枚举
+public interface IEnumerable
+{
+    IEnumerator GetEnumerator();
+}
+
+//这个接口允许调用方获取一个容器的子项
+public interface IEnumerator
+{
+    bool MoveNext();             //将游标的内部位置向前移动
+    object Current{get;}       //获取当前的项（只读属性）
+    void Reset();                 //将游标重置到第一个成员前面
+}
+System.Array类型和其他许多类型（如List）已经实现了IEnumerable和IEnumerator接口，
+
+namespace MyCarIEnumerator  
+{  
+    public class Garage:IEnumerable  
+    {  
+        Car[] carArray = new Car[4];  
+  
+        //启动时填充一些Car对象  
+        public Garage()  
+        {  
+            carArray[0] = new Car("Rusty", 30);  
+            carArray[1] = new Car("Clunker", 50);  
+            carArray[2] = new Car("Zippy", 30);  
+            carArray[3] = new Car("Fred", 45);  
+        }  
+        public IEnumerator GetEnumerator()  
+        {  
+            return this.carArray.GetEnumerator();  
+        }  
+    }  
+}  
+
+//除此之外，GetEnumerator()被定义为公开的，对象用户可以与IEnumerator类型交互：   
+namespace MyCarIEnumerator  
+{  
+    class Program  
+    {  
+        static void Main(string[] args)  
+        {  
+            Console.WriteLine("*********Fun with IEnumberable/IEnumerator************\n");  
+            Garage carLot = new Garage();  
+  
+            //交出集合中的每一Car对象吗  
+            foreach (Car c in carLot)  //之所以遍历carLot，是因为carLot.GetEnumerator()返回的项时Car类型，这个十分重要  
+            {  
+                Console.WriteLine("{0} is going {1} MPH", c.CarName, c.CurrentSpeed);  
+            }  
+  
+            Console.WriteLine("GetEnumerator被定义为公开的，对象用户可以与IEnumerator类型交互，下面的结果与上面是一致的");  
+            //手动与IEnumerator协作  
+            IEnumerator i = carLot.GetEnumerator();  
+            while (i.MoveNext())  
+            {   
+                Car myCar = (Car)i.Current;  
+                Console.WriteLine("{0} is going {1} MPH", myCar.CarName, myCar.CurrentSpeed);  
+            }  
+            Console.ReadLine();  
+        }  
+    }  
+}  

@@ -1,0 +1,23 @@
+类继承一下IDragHandler,IPointerDownHandler,IPointerUpHandler
+然后在代码里写三个方法，如下：
+
+		public void OnDrag(PointerEventData eventData){
+                GetComponent<RectTransform> ().pivot.Set (0, 0);
+                transform.position = Input.mousePosition;
+        }
+ 
+        public void OnPointerDown(PointerEventData eventData){
+                transform.localScale = new Vector3 (0.7f, 0.7f, 0.7f);
+                transform.SetParent (initCanvas.transform, true);
+                transform.GetComponent<CanvasGroup> ().blocksRaycasts = false;
+        }
+ 
+        public void OnPointerUp(PointerEventData eventData){
+                transform.localScale = new Vector3 (1f, 1f, 1f);
+                if (eventData.pointerCurrentRaycast.gameObject != null) {
+                        if (eventData.pointerCurrentRaycast.gameObject.name == grid.name) {
+                                transform.SetParent (grid.transform);
+                        }
+                }
+                transform.GetComponent<CanvasGroup> ().blocksRaycasts = true;
+        }

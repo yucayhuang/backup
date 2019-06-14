@@ -1,0 +1,9 @@
+private static ModelLocator instance;  
+public static ModelLocator getInstance{  
+    get{  
+        if(instance==null){  
+            instance=new ModelLocator();  
+        }  
+        return instance;  
+    }  
+}  

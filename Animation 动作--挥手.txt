@@ -1,0 +1,94 @@
+通过控制骨骼，挥手
+
+var mixTransform : Transform = transform.Find(“root/upper_body/left_shoulder”);
+ 
+animation[“wave_hand”].AddMixingTransform(mixTransform);
+
+
+
+
+
+
+
+
+
+
+
+
+
+//射击
+
+function Start () {
+   //循环播放
+   animation.wrapMode = WrapMode.Loop;
+   //射击动作不循环
+   animation["shoot"].wrapMode = WrapMode.Once;
+   // idle 和walk 设置低优先级默认为.
+   animation["shoot"].layer = 1;
+   //停止
+   animation.Stop();
+}
+function Update () {
+   //按键
+   if (Mathf.Abs(Input.GetAxis("Vertical")) > 0.1)
+      animation.CrossFade("walk");
+   else
+      animation.CrossFade("idle");
+   // 开火
+   if (Input.GetButtonDown ("Fire1"))
+      animation.CrossFade("shoot");
+}
+
+
+
+
+
+
+
+
+// 淡入淡出
+// Fade the walk cycle in and fade all other animations in the same layer out.
+// 淡入walk循环并且淡出同一层的所有其他动画。
+// Complete the fade within 0.2 seconds.
+// 在0.2秒之内完成淡入淡出。
+animation.CrossFade("Walk", 0.2);
+另一个例子：
+
+C#JavaScript
+// Makes a character contains a Run and Idle animation 
+// fade between them when the player wants to move
+// 让一个角色包含Run和Idle动画，并且在玩家想移动的时候在他们之间淡入淡出。
+function Update () {
+	if (Mathf.Abs(Input.GetAxis("Vertical")) > 0.1)
+		animation.CrossFade("Run");
+	else
+		animation.CrossFade("Idle");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 使这个角色的所有动画的播放速度降为一半
+ 
+　　for (var state : AnimationState in animation) {
+ 
+　　state.speed = 0.5;
+ 
+　　}

@@ -1,0 +1,392 @@
+父子节点相关的：
+parent 变量表示Transform的父节点
+root表示它的根节点，如果没有父节点，它会返回自己
+Transform Find(string name)根据名字查找子节点
+bool IsChildOf(Transform node)判断该Transform是否某Transform的子节点
+void DetachChildren()解除所有子节点的父子关系
+１．通过名字找物体
+　　　GameObject.Find("Player")
+２．通过名字寻找物体子集
+transform.FindChild("物体子集名字")
+３. 显示和隐藏物体
+ gameObject.SetActive(true); 
+４.使用和关闭物体代码
+gameObject.GetComponent<代码名字>().enable=true;
+
+５．按下动画事件　if(Input.GetMouseButton(0))
+按下事件　　　if(Input.GetMouseButtonDown(0))
+抬起事件　　　if(Input.GetMouseButtonUp(0))
+
+６．销毁一样标签的物体
+GameObject []objs = GameObject.FindGameObjectsWithTag("标签名");
+foreach(GameObject obj in objs){
+Destroy(obj);
+}
+７．物体水平匀速移动
+transform.Translate(-0.1f*Time.deltaTime,0,0);
+8.<<是除以2，>>是乘以2
+
+9.位置相关的：　5个和位置相关的Vector3类型变量
+up 表示世界坐标的Y轴方向
+right表示世界坐标的X轴方向
+forward表示世界坐标的Z轴方向
+position表示对象在世界坐标系中的位置
+localPosition表示对象相对父节点变换的坐标位置
+ 
+改变物体颜色
+obj.renderer.material.color=Color.red
+     
+ 
+ 
+10. 2个Quaternion类型的变量
+    rotation在世界坐标系中的旋转角度，是一个Quaternion对象（四元数）
+   localRotation相对于父节点的旋转角度
+ 
+11.父子节点相关的：
+   parent变量表示Transform的父节点
+  Transform Find(string name)根据名字查找子节点
+  bool IsChildOf(Transform node)判断该Transform是否某Transform的子节点
+  void DetachChildren()解除所有子节点的父子关系
+ 
+12.鼠标：
+  Input.mousePosition表示鼠标当前的像素位置（坐标系如何？以左下角为原点）
+ 
+ 接下来这三个函数的参数，0左键，1右键，2中键
+  GetMouseButton对应的键处于按下状态时返回true
+  GetMouseButtonDown对应的键被按下时返回true
+  GetMouseButtonUp对应的键弹起时返回true
+13.
+ OnMouseDown 当鼠标点击到对象的时候回调
+ OnMouseDrag 当鼠标拖拽对象时调用，在IgnoreRaycast层上无效
+ OnMouseEnter 当鼠标进入对象时调用
+ OnMouseExit 当鼠标离开对象时调用
+ OnMouseOver 当鼠标停留在对象上面时调用
+ OnMouseUpAsButton 鼠标在同一个对象上按下，并弹起时调用
+ OnMouseUp跟楼上一样
+ 
+ 
+14.
+动画倒放 animation.speed *= -1.0;
+
+15.
+寻找场景中物体var door = GameObject.Find("door").transform;
+
+16.
+全局变量用法，A.js 里的 static var AAA 到 B.js 里调用方式为 A.AAA
+
+17.
+function Awake() 创建一个物体时自动运行的程序
+
+18.
+js 中可以使用 "" +  0 将数字转换为字符串
+
+19.
+3d字体较为模糊是因为使用了anti-aliasing，可以创建大的字体物体，将字体属性中的 size 设为小一些来解决
+
+20.
+InvokeRepeating(函数名, 开始执行函数的时间, 调用函数的间隔时间);和 Update() 差不多但可以间隔着时间执行
+
+21.
+Quaternion.Slerp(起点，目标点，期间耗费时间)
+
+22.
+解决轴心问题，用物体绑定到 Empty GameObject 之下
+
+23.
+隐藏鼠标 Screen.showCursor = false;
+
+24.
+FixedUpdate（）以指定频率被调用。
+可以在 Edit -> project settings -> Time -> Fixed Timestep 中设定该频率。
+
+25.
+计算圆半径 wheel.tireGraphic.renderer.bounds.size.y / 2;
+
+26.
+显示载入关卡的进度条
+var levelToLoad = 1;
+function LoadNewLevel () {
+if (Application.CanStreamedLevelBeLoaded (levelToLoad)) {
+Application.LoadLevel (levelToLoad);
+}
+}
+如果想在播放器中显示下载进度，可以通过GetStreamProgressForLevel()函数来读取进
+度。
+
+27.
+用灯光中的 cookie 选项可以模拟移动的云的阴影
+
+28.
+模拟爆炸伤害
+1）
+使用 Component->Particle->World Particle Collider 添加一个粒子碰撞物体
+如果 Send Collision Message 被启用， 任何发生碰撞的粒子都会发送一个
+OnParticleCollision()到粒子系统附加的物体和与粒子发生碰撞的物体上。
+2）
+调用 OnDrawGizmosSelected () 或者 OnDrawGizmos() 函数
+
+29.
+function Update () {
+if (Input.GetButtonDown ("Jump")) {
+if (renderer.material.mainTexture.isPlaying) {
+renderer.material.mainTexture.Pause();
+}
+else {
+renderer.material.mainTexture.Play();
+}
+}
+}
+
+30.
+function Start () {
+yield WaitForSeconds(3);
+print("hello");
+}.
+
+31.
+容器菜单里的选项随着导入工程而变化
+
+32.
+把物体直接层级面板拖动到工程面板就是Prefab了
+
+33.
+@script AddComponentMenu("Universol Conraller/Cube Controller") //把容器添加进菜单栏
+@script RequireComponent(Llight)  在物体中加入某个容器
+
+34.
+Camera.main可以得到相机
+
+35.
+Collider 必须搭配 Rigidbody 来使用，就像 Rigidbody 必须搭配 GameObject 一样
+
+36.
+RigidBody 中的 IsKinematic 勾选后就不受物理控制了，没有重力了，但加了碰撞的Rigidbody物体还是会接收碰撞，但只能该物体碰撞它物体，如果受到它物体的碰撞不会发生反应，但触发器能接收信号，一般 IsKinematic 物体在完全受用户控制而不受其他物体影响时使用
+宜于勾选的物体
+赛车、子弹、人物、地形等
+不宜勾选的物体
+可被撞倒的路边垃圾桶、足球等
+RigidBody 中的 Continuous/Continuous Dynamic 可以让运动物体碰撞静止物体时产生触碰信号
+RigidBody 中的 sleepVelocity 可以忽略最小的运动来停止
+
+37.
+Reset() 替换，用于设置物体的默认值也可以用
+
+38.
+几个物体只要一个激活了其他就不能被调用的情况可以用设置 Static 物体来处理
+
+39.
+iphone的常亮：iPhoneSettings.screenCanDarken = false;
+
+40.
+Good organization is important if you want your workflow to be smooth and hassle
+free.
+Use instantiated Prefabs wherever possible.
+Try organizing by function instead of type.
+Use Empty GameObjects as containers.
+
+41.
+音效来源Apple's own Garage Band, Logic Studio 8 and Soundtrack / Soundtrack Pro software
+
+42.
+CollisionFlags 可判断出碰撞物体的方向
+
+43.
+Camera 容器的 Depth 参数可以调整几个摄像机的层级关系
+
+44.
+为什么这里要用 SendMessage();playerLink.GetComponent(ThirdPersonController).SendMessage("HidePlayer");
+
+45.
+LOD（Level-of-detail 编辑器）
+
+46.
+QualitySettings.currentLevel = QualityLevel.Fastest;
+
+47.
+ctrl + shift + n 新建 Empty GameObject
+
+48.
+BeginGroup + EndGroup 可以创建一个类似 window 的区域，同时进行移动操作
+
+49.
+导入文件时勾选 Generate Colliders 选项会自动为物体加入 MeshCollider 碰撞体
+
+50.
+如何查看场景是否已经完成预加载，显示进度条功能
+function Start() {
+      var async : AsyncOperation = Application.LoadLevelAsync("Game");
+      yeild async;
+      Debug.log("Loading Complete");
+}
+function OnGUI() {
+      //显示进度条
+      GUI.Label(Rect(100,300,200,200),(Application.GetStreamProgressForLevel(1) * 100.ToString(), "%");;
+      //如果已经预加载完毕，则点击 Start 进入场景
+      if(GUI.Button(Rect(100,100,200,100), "Start")){
+           if(Application.CanStreamedLevelBeLoaded(1)) {
+                  Application.LoadLevel("Game");
+            }
+      }
+}
+另外WWW.Progress 可以检测下载进度(0~1)
+EditorUtility.DisplayProgressBar 可以显示进度条
+
+51.
+Unity 下载 OGG 音乐
+public class DAudio: MonoBehaviour
+{
+    string url = "http://XXXXXXXXXXXXXXXXXXXXXXXX.ogg";
+    WWW myWWW;
+    AudioClip ac;
+    IEnumerator WWWLoading()
+    {
+        myWWW = new WWW(url);
+        yield return myWWW;
+        ac = myWWW.audioClip;
+    }
+    void Start()
+    {
+        StartCoroutine(WWWLoading());
+    }
+    void OnGUI()
+    {
+            if (myWWW.isDone)
+                audio.clip = ac;
+    }
+}
+
+52.
+Unity API 坏了，搜索 API 时看似搜到了结果，但一条结果都未显示
+上网下载 index.js覆盖原有的 index.js
+
+53.
+各种常用数学函数
+Mathf.CeilToInt: 根据小数取整，如果该数不是整数，就加一个正的小数让他变成整数
+Mathf.FloorCeilToInt: 根据小数取整，如果该数不是整数，就减一个正的小数让他变成整数
+Mathf.RoundToInt: 根据小数取整数，四舍六入，如果小数是 0.5，则根据当前整数位取偶数整数
+
+54.
+判断是否下载完毕
+使用 myWWW.isDone 或者 myWWW.progress == 1f  来判断
+尤其注意判断条件要写在 OnGUI() 里，不能写在 Update() 里，否则判断结果会有误差
+
+55.
+如何在多个脚本中控制每个 Start 函数调用的先后顺序
+在一个主 Start() 函数中依次调用各个脚本的初始化函数
+使用全局静态变量，当前一个脚本中的相应初始化函数模块初始化完毕后，改变全局静态变量值来通知下一个脚本开始初始化。
+
+56.
+自定义函数继承 Transform 或 GameObject 的方法
+严格的来说是不行的，一般只能使用将自定义类作为 Component 绑定到物体上的方法，该物体可以是新建的 GameObject 或者克隆出的物体皆可
+
+57.
+用 VS2010 打开项目文件失败，如下提示：
+Couldn't call method SyncVisualStudioProject because the class SyncVS couldn't be found.
+UnityEditor.DockArea:OnGUI()
+解决方法：在 Unity 中，改变项目中的该脚本的位置（拖至其他文件夹下或最顶层），不要放在文件夹里打开，此时即可用 VS 打开，然后如果再拖回先前的文件夹后，也依然能打开
+
+58.
+GUI 图片按中心进行旋转或缩放
+RotateAroundPivot(float angle, Vector2 pivotPoint)
+ScaleAroundPivot(Vector2 scale, Vector2 pivotPoint)
+
+59.
+if 语句尽量使用大括号，否则容易出现让人摸不着头脑的错误
+比如：
+if(false)
+    Debug.Log("AAA");
+else
+    Debug.Log("BBB");
+print("CCC");
+由于Debug最终不输出，结果就被编译成了
+ if(false) {
+    else{
+        print("CCC");
+    }
+}
+
+60.
+查看自身能否看着目标物体（目标物体是否在背后）
+Vector3 dir = (target.position - transform.position).normalized;
+float direction = Vector3.Dot(dir, transform.forward);
+
+61.
+如何建立不受父亲物体影响的位置移动
+Transform.TransformDirection(Vector3 direction)
+Transform.Translate(Vector3 direction, Space.World)
+
+62.
+通过脚本控制物体的几种方法
+1) 通过 GameObject.Find("物体名字") 保存该物体，然后就可随意对其控制了
+2) 脚本中设置 public transform 物体，脚本给其他物体后，在外部把相应物体拖入
+3) 直接给该物体，脚本中直接使用 transform 来控制
+
+63.
+参照某一点缩放整个 GUI 的方法
+GUIUtility.ScaleAroundPivot (Vector2 scale, Vector2 pivotPoint);
+
+64.
+截屏的方法
+        Texture2D tex;              //截图生成的图片
+        //最终获取图像大小
+        tex = new Texture2D((int)texMax.z, (int)texMax.w, TextureFormat.RGB24, false);
+        //截取屏幕的区域
+        tex.ReadPixels(new Rect(texMax.x, texMax.y, texMax.z, texMax.w), 0, 0);
+        //接受大小修改
+        tex.Apply();
+
+65.
+动态缩小图片的方式
+GUI.DrawTexture(new Rect(shotPngX, camRect.y, shotPngWidth, camRect.height), tex, ScaleMode.StretchToFill, true);
+
+66.
+计算匀速数字变化
+height = Mathf.Lerp(height, 10f, flightSpeed * Time.deltaTime / (10f - height));
+
+67.
+如何锁定轴向运动
+Component >> Physics >> Configurable Joint
+
+68.
+在视图中按下 Ctrl + F，可以快速输入要查找的物体名字来定位物体
+
+69.
+如何显示局部 GUI 界面
+通过 GUI.Window() 作为窗口物体
+
+70.
+相机剔除，也就是选择相机所看到的层
+camera.cullingMask = 1 << LayerMask.NameToLayer("LayerName");
+或者camera.cullingMask = Mathf.Pow(2, LayerMask.NameToLayer("LayerName"))
+前一种效率更高，后一种让代码更易读
+想添加多个剔除的话可以用
+camera.cullingMask = 1 << LayerMask.NameToLayer("LayerName1");
+camera.cullingMask += 1 << LayerMask.NameToLayer("LayerName2");
+…………
+
+71.
+鼠标经过按钮提示文字标签功能
+GUI.Button(newRect(10, 10, 100, 20), newGUIContent("Click me", "This is the tooltip"));
+GUI.Label(newRect(10, 40, 100, 40), GUI.tooltip); 
+
+72.
+焦点改变事件
+curFocus = GUI.SetNextControlName("name");
+name = GUI.TextField(nameRect, name);
+GUI.GetNameOfFocusedControl();
+注：Button不能记录 Focus 事件，需要手动记录
+例如：
+if(GUI.Button(ApplyRect, "OK"))
+{
+        curFocus = "OK";
+} 
+
+
+
+插件
+1.GUI 的插件：iGUI、UIToolKit
+2.地形插件：TerrainToolkit
+模型类型
+ .FBX, .dae, .3DS, .dxf .obj
+图片类型
+PSD, TIFF, JPG, TGA, PNG, GIF, BMP, IFF, PICT

@@ -1,0 +1,302 @@
+
+
+很多刚入行的小白同学在处理类与类之间的关系时，总是比较简单除暴的处理，直接把那个类引用到这个类，把这个类引用到那个类，最后造成很多类相互引用，形成一个复杂的蜘蛛网式的引用关系，这就是代码的耦合。那这个又有什么关系呢？那么我们就通俗的讲一下这个问题。
+
+打个比方，同学们的期末成绩出来了，然后学校派一个人到全校的学生家里一个个通知成绩，第二天这个人辞职了哈哈！那么学校会怎么做呢？在远古时代，学校一般都是会在学校的公示栏上公布所有学生的期末成绩，而在如今的互联网时代，学校一般都是把所有学生的期末成绩发布到自己系统内，想要知道成绩的同学自己去查看，这样就不会有人辞职了哈哈。学校的系统不认识是哪个学生，也不关心哪个学生要不要看自己的成绩，反正我发布出去了，有兴趣要看的同学可以自己去查看，我们之间没有任何的绯闻，你成绩好不好和我没关系。
+
+这个过程就叫解耦，类与类之间不再有耦合关系，没有小三，也没有小四，家和万事兴。
+
+所以我们引入了事件机制，事件机制其实是一种叫做观察者模式的设计模式，事件的本质是一种方法的委托（Delegate），把回调方法委托到事件管理器，当条件达到时，通过事件key来告诉事件管理器可以执行那些委托的方法。
+
+好了，接下来XM就为大家讲解一套完整的消息系统。
+
+1.首先我们先来定义一下消息结构的接口IMessage。
+
+ 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+ 
+public interface IMessage
+{
+    /// <summary>
+    /// 事件类型，Key
+    /// </summary>
+    int Type { get; set; }
+ 
+    /// <summary>
+    /// 发送者
+    /// </summary>
+    System.Object Sender { get; set; }
+ 
+    /// <summary>
+    /// 参数
+    /// </summary>
+    System.Object[] Params { get; set; }
+ 
+    /// <summary>
+    /// 转字符串
+    /// </summary>
+    /// <returns></returns>
+    string ToString();
+}
+为什么我会用int类型而不是用string类型作为消息的key呢？大家可以自己思考一下。
+
+2.接口IMessage的实现Message。
+
+
+ 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+ 
+public class Message : IMessage {
+    public int Type { get; set; }
+ 
+    public System.Object[] Params { get; set; }
+ 
+    public System.Object Sender { get; set; }
+ 
+    public override string ToString()
+    {
+        string arg = null;
+        if (Params != null)
+        {
+            for (int i = 0; i < Params.Length; i++)
+            {
+                if ((Params.Length > 1 && Params.Length - 1 == i) || Params.Length == 1)
+                {
+                    arg += Params[i];
+                }
+                else
+                {
+                    arg += Params[i] + " , ";
+                }
+            }
+        }
+ 
+        return Type + " [ " + ((Sender == null) ? "null" : Sender.ToString()) + " ] " + " [ " + ((arg == null) ? "null" : arg.ToString()) + " ] ";
+    }
+ 
+    public Message Clone()
+    {
+        return new Message(Type, Params, Sender);
+    }
+ 
+    public Message(int type)
+    {
+        Type = type;
+    }
+ 
+    public Message(int type, params System.Object[] param)
+    {
+        Type = type;
+        Params = param;
+    }
+ 
+    public Message(int type, System.Object sender, params System.Object[] param)
+    {
+        Type = type;
+        Params = param;
+        Sender = sender;
+    }
+}
+3.接下来我们定义一下消息的类型，这里我把消息类型分成了常用消息，战斗消息，协议消息3大类，而不是都写在一个类型里面，结构清晰明了。
+
+ 
+/// <summary>
+/// 消息的类型  
+/// </summary>
+public enum MessageType
+{
+    /// <summary>
+    /// 启动
+    /// </summary>
+    START_UP = 1000,
+    /// <summary>
+    /// 解压
+    /// </summary>
+    UNPACK,
+    /// <summary>
+    /// 更新
+    /// </summary>
+    UPDATE,
+    /// <summary>
+    /// 更新完成
+    /// </summary>
+    UPDATE_COMPLETE,
+}
+ 
+ 
+/// <summary>
+/// 战斗的类型
+/// </summary>
+public enum BattleEvent
+{
+    /// <summary>
+    /// 攻击
+    /// </summary>
+    Attack = 10000,
+}
+ 
+/// <summary>
+/// 协议的类型
+/// </summary>
+public enum ProtocolEvent
+{
+ 
+}
+4.然后我们定义一下消息派发者的接口IDispatcher。
+
+ 
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+ 
+public interface IDispatcher
+{
+    void AddListener(int type, EventListenerDelegate listener);
+ 
+    void RemoveListener(int type, EventListenerDelegate listener);
+ 
+    void SendMessage(Message evt);
+ 
+    void SendMessage(int type, params System.Object[] param);
+ 
+    void Clear();
+}
+5.接口IDispatcher的实现Dispatcher。
+
+ 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+ 
+ 
+public delegate void EventListenerDelegate(Message evt);
+ 
+public class Dispatcher : Singleton<Dispatcher>, IDispatcher
+{
+    
+    private Dictionary<int, EventListenerDelegate> events = new Dictionary<int, EventListenerDelegate>();
+ 
+    public void AddListener(int type, EventListenerDelegate listener)
+    {
+        if (listener == null)
+        {
+            XMDebug.LogError("AddListener: listener不能为空");
+            return;
+        }
+ 
+        EventListenerDelegate myListener = null;
+        events.TryGetValue(type, out myListener);
+        events[type] = (EventListenerDelegate)Delegate.Combine(myListener, listener);
+    }
+ 
+ 
+    public void RemoveListener(int type, EventListenerDelegate listener)
+    {
+        if (listener == null)
+        {
+            XMDebug.LogError("RemoveListener: listener不能为空");
+            return;
+        }
+ 
+        events[type] = (EventListenerDelegate)Delegate.Remove(events[type], listener);
+    }
+ 
+    public void Clear()
+    {
+        events.Clear();
+    }
+ 
+    public void SendMessage(Message evt)
+    {
+        EventListenerDelegate listenerDelegate;
+        if (events.TryGetValue(evt.Type, out listenerDelegate))
+        {
+            try
+            {
+                if (listenerDelegate != null)
+                {
+                    listenerDelegate(evt);
+                }
+            }
+            catch (System.Exception e)
+            {
+                XMDebug.LogError("SendMessage:", evt.Type.ToString(), e.Message, e.StackTrace, e);
+            }
+        }
+    }
+ 
+    public void SendMessage(int type, params System.Object[] param)
+    {
+        EventListenerDelegate listenerDelegate;
+        if (events.TryGetValue(type, out listenerDelegate))
+        {
+            Message evt = new Message(type, param);
+            try
+            {
+                if (listenerDelegate != null)
+                {
+                    listenerDelegate(evt);
+                }
+            }
+            catch (System.Exception e)
+            {
+                XMDebug.LogError("SendMessage:", evt.Type.ToString(), e.Message, e.StackTrace, e);
+            }
+        }
+    }
+ 
+ 
+    public void AddListener(MessageType type, EventListenerDelegate listener)
+    {
+        AddListener((int)type, listener);
+    }
+ 
+    public void AddListener(BattleEvent type, EventListenerDelegate listener)
+    {
+        AddListener((int)type, listener);
+    }
+ 
+    public void AddListener(ProtocolEvent type, EventListenerDelegate listener)
+    {
+        AddListener((int)type, listener);
+    }
+ 
+    public void RemoveListener(MessageType type, EventListenerDelegate listener)
+    {
+        RemoveListener((int)type, listener);
+    }
+ 
+    public void RemoveListener(BattleEvent type, EventListenerDelegate listener)
+    {
+        RemoveListener((int)type, listener);
+    }
+ 
+    public void RemoveListener(ProtocolEvent type, EventListenerDelegate listener)
+    {
+        RemoveListener((int)type, listener);
+    }
+ 
+    public void SendMessage(MessageType type, params System.Object[] param)
+    {
+        SendMessage((int)type, param);
+    }
+ 
+    public void SendMessage(BattleEvent type, params System.Object[] param)
+    {
+        SendMessage((int)type, param);
+    }
+ 
+    public void SendMessage(ProtocolEvent type, params System.Object[] param)
+    {
+        SendMessage((int)type, param);
+    }
+}
+
+我为每个实现接口的方法又重新封装了3个重载方法，这里主要是为了区分消息的类型，方便更好的维护我们的框架，希望同学们都能养成这样的编写代码习惯。
+
+最后，为了不要再让有人因为跑腿辞职，我们还是用好消息系统，不然他们就要跑去送外卖了

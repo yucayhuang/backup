@@ -1,0 +1,220 @@
+例子：比如想把按钮的点击区域改成不规则的。
+
+1.把按钮的image的RaycastTarget关闭勾选
+
+2.在子节点创建新的gameObject挂上下面UIPolygon脚本。
+
+3.编辑Polygon的区域即可。
+
+
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+[RequireComponent(typeof(PolygonCollider2D))]
+public class UIPolygon : Image 
+{
+    private PolygonCollider2D _polygon = null;
+    private PolygonCollider2D polygon 
+    {
+        get{
+            if(_polygon == null )
+                _polygon = GetComponent<PolygonCollider2D>();
+            return _polygon;
+        }
+    }
+    protected UIPolygon()
+    {
+        useLegacyMeshGeneration = true;
+    }
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+    }
+    public override bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)
+    {
+        return polygon.OverlapPoint( eventCamera.ScreenToWorldPoint(screenPoint));
+    }
+ 
+ #if UNITY_EDITOR
+    protected override void Reset()
+    {
+        base.Reset();
+        transform.localPosition = Vector3.zero; 
+        float w = (rectTransform.sizeDelta.x *0.5f) + 0.1f;
+        float h = (rectTransform.sizeDelta.y*0.5f)  + 0.1f;
+        polygon.points = new Vector2[] 
+        {
+            new Vector2(-w,-h),
+            new Vector2(w,-h),
+            new Vector2(w,h),
+            new Vector2(-w,h)
+          };
+    }
+#endif
+}
+#if UNITY_EDITOR
+[CustomEditor(typeof(UIPolygon), true)]
+public class UIPolygonInspector : Editor
+{
+    public override void OnInspectorGUI()
+    {
+    }
+}
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[MenuItem("NGUI/Attach/PolygonCollider2D")]
+    public static void AddPolugonCollider2D() 
+    {
+        if(Selection.activeGameObject != null)
+        {
+            foreach(GameObject go in Selection.gameObjects)
+            {
+                UIWidget widget = go.GetComponent<UIWidget>();
+                if(widget != null)
+                {
+                    PolygonCollider2D polygoncllider = go.GetComponent<PolygonCollider2D>();
+
+                    if(polygoncllider == null)
+                    {
+                        polygoncllider = go.AddComponent<PolygonCollider2D>();
+                    }
+
+                    Vector2[] vectors = new Vector2[4];
+                    int widthHalf = (widget.width >> 1) + 20;
+                    int heightHalf = (widget.height >> 1) + 20;
+                    vectors[0] = new Vector2(-widthHalf, -heightHalf);
+                    vectors[1] = new Vector2(widthHalf, -heightHalf);
+                    vectors[2] = new Vector2(widthHalf, -heightHalf);
+                    vectors[3] = new Vector2(-widthHalf, -heightHalf);
+                    polygoncllider.points = vectors;
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+减少2D碰撞体的顶点数量—PolygonCollider2D
+
+本篇文章给大家介绍下如何用PolygonCollider2D组件实现减少2D碰撞体的顶点数量，
+想知道的同学可以看看下面的实现方法。
+
+实现代码：
+/** 
+ * Author: Engidia SCP - Eduard Bosch (eduardbosch@engidia.com) 
+ * File: RemoveInternalShapes.cs 
+ */  
+using UnityEngine;  
+using UnityEditor;  
+using System.Collections;  
+using System.Collections.Generic;  
+using System.Linq;  
+public class ReduceVertexPolygonCollider2D  
+｛  
+
+    [MenuItem ("GameObject/Reduce Vertex of PolygonCollider", true)]  
+    static bool ValidateRemoveShapes ()  
+    ｛  
+        foreach (GameObject objects in Selection.gameObjects) ｛  
+            PolygonCollider2D collider = objects.GetComponent<PolygonCollider2D> ();  
+            return (collider != null && collider.pathCount >= 1);  
+        ｝  
+        return false;  
+    ｝  
+
+    [MenuItem ("GameObject/Reduce Vertex of PolygonCollider")]  
+    static void RemoveShapes ()  
+    ｛  
+        foreach (GameObject objects in Selection.gameObjects) ｛  
+            PolygonCollider2D collider = objects.GetComponent<PolygonCollider2D> ();  
+            if (collider == null) ｛  
+                continue;  
+            ｝  
+            Undo.RecordObject (collider, "Remove Interior Shapes");  
+            var path1 = GetOutlinePath (collider);  
+            var path2 = RemovePlane (path1);  
+            var path3 = RemoveClosePolygon (path2);  
+            collider.SetPath (0, path3);  
+        ｝  
+    ｝  
+
+    static Vector2[] GetOutlinePath (PolygonCollider2D collider)  
+    ｛  
+        int lExteriorShape = 0;  
+        float lLeftmostPoint = Mathf.Infinity;  
+        for (int i=0, length=collider.pathCount; i<length; ++i) ｛  
+            Vector2[] lPath = collider.GetPath (i);  
+            foreach (Vector2 lPoint in lPath) ｛  
+                if (lPoint.x < lLeftmostPoint) ｛  
+                    lExteriorShape = i;  
+                    lLeftmostPoint = lPoint.x;  
+                ｝  
+            ｝  
+        ｝  
+        collider.pathCount = 1;  
+        return collider.GetPath (lExteriorShape);  
+    ｝
+  
+    static Vector2 [] RemoveClosePolygon (Vector2[] lPath)  
+    ｛  
+        List<Vector2> verticesList = new List<Vector2> (lPath);  
+        foreach (var node in lPath) ｛  
+            if (verticesList.Exists (item => Vector3.Distance (node, item) < 0.3f && item != node)) ｛  
+                verticesList.Remove (node);  
+                continue;  
+            ｝  
+        ｝  
+        return verticesList.ToArray ();  
+    ｝  
+
+    static Vector2[] RemovePlane (Vector2[] lPath)  
+    ｛  
+        var verticesList = new List<Vector2> (lPath);  
+        for (int i=1; i<lPath.Length - 1; i+= 2) ｛  
+            var first = lPath [i - 1];  
+            var second = lPath [i];  
+            var third = lPath [i + 1];  
+            var angle1 = Vector2.Angle (first, second);  
+            var angle2 = Vector2.Angle (second, third);  
+            if (Mathf.Abs (angle1 - angle2) < 30) ｛  
+                verticesList.Remove (second);  
+                continue;  
+            ｝  
+        ｝  
+        return verticesList.ToArray ();  
+    ｝  
+｝  
